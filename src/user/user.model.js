@@ -1,5 +1,7 @@
 import mongoose from 'mongoose'
 import bcrypt   from 'bcrypt'
+import { networkInterfaces } from 'os';
+
 /**
  * Here is the our user schema which will be used to
  * validate the data sent to our database.
@@ -15,6 +17,11 @@ const userSchema = new mongoose.Schema({
             type: String,
             required: true,
           },
+          role_id: {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'Role',
+            required: true
+          },
           status: {
             type: Number,
             default: 1
@@ -22,6 +29,15 @@ const userSchema = new mongoose.Schema({
           created_at: {
             type: Date,
             default: Date.now
+          },
+          created_by: {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: 'User',
+            default: null
+          },
+          archived:{
+              type: Boolean,
+              default: false
           }
 
 });
@@ -56,6 +72,22 @@ userSchema.method('comparePassword', function comparePassword(
   }
   return bcrypt.compare(candidate, this.password);
 });
+
+userSchema.pre('save', function(next) {
+  if (!this.isModified('password')) {
+    next();
+  } else {
+    bcrypt
+      .genSalt(10)
+      .then(salt => bcrypt.hash(this.password, salt))
+      .then(hash => {
+        this.password = hash;
+        next();
+      })
+      .catch(next);
+}
+});
+
 
 /**
  * Finally, we compile the schema into a model which we then

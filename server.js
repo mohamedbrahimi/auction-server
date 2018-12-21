@@ -6,15 +6,28 @@ import path             from  'path'
 import express_graphql  from  'express-graphql'
 import mongoose         from 'mongoose'
 // Roote
-import IndexRoute from  './routes/index';
+import IndexRoute    from  './routes/index'
+import IndexServices from './routes/services'
 // GraphQl Schema
 import schema     from  './schema/schema';
 // Settings
 import config from './settings/config'
+import { errorType } from './settings/errors'
+// permisson
+import checkpermission from  './middlewar/check-permissions'
 
 
 
+// traitement of error 
 
+const getErrorCode = errorName => {
+	return errorType[errorName];
+}
+
+const ObjectId = mongoose.Types.ObjectId;
+ObjectId.prototype.valueOf = function () {
+	return this.toString();
+};
 // Create an express server and GraphQlendpoint
 const app = express()
 
@@ -32,7 +45,7 @@ mongoose.connect(config.mongodb.uri,
 	reconnectTries: Number.MAX_VALUE,
 	reconnectInterval: 1000,
 	useNewUrlParser: true,
-	useCreateIndex: true
+	useCreateIndex: true,
  }
 );
 const connection = mongoose.connection;
@@ -41,11 +54,23 @@ connection.once('open', () => {
   console.log('MongoDB database connection established successfully!');
 });
 
-app.use('/graphql', express_graphql({
+app.use('/graphql',checkpermission, express_graphql({
    schema: schema,
-   graphiql: true
+   withCredentials: true,
+   graphiql: true,
+   formatError: (err) => {
+	   let error = getErrorCode(err.message);
+	   try{
+		return ({ message: error.message, statusCode: error.statusCode})
+	   }catch(e){
+          return err
+	   }
+	   
+   }
+
 }))
 
+app.use('/services',IndexServices);
 app.use('/',IndexRoute);
 
 // view engine setup

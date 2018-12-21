@@ -4,9 +4,7 @@ import config from '../settings/config'
 module.exports = (req, res, next) => {
     try {
           
-        const token = req.headers.authorization;
-        const decoded = jwt.verify(token, config.token.secret);
-        req.userData = decoded;
+        console.log(req.body.operationName)
         next();
     } catch (error) {  
         return res.status(401).json({ 
