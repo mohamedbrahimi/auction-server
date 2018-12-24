@@ -1,6 +1,8 @@
 import Role from './role.model';
 import User from '../user/user.model';
 
+import config from '../../settings/config';
+import jwt from 'jsonwebtoken';
 import { errorName } from '../../settings/errors';
 /**
  * Export a string which contains our GraphQL type definitions.
@@ -81,11 +83,19 @@ export const roleResolvers = {
     }
   },
   Mutation: {
-    addRole: async (_, { input }) => {
+    addRole: async (_, { input }, context) => {
       const exist = await Role.findOne({label : input.label});
       if(exist){
         throw new Error(errorName.TRYCREATEROLE_DUPLICATELABEL);
       }else{
+        const token      = context.headers.authorization;
+        try{
+          const decoded    = jwt.verify(token, config.token.secret);
+          input.created_by = decoded.id;
+        }catch(e){
+          console.log('error: create a new user. can\'t get the jwt object');
+        }
+        
         const role  = await Role.create(input);
         return role;
       }

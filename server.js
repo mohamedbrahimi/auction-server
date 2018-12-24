@@ -63,7 +63,10 @@ app.use('/graphql',checkpermission, express_graphql({
 	   try{
 		return ({ message: error.message, statusCode: error.statusCode})
 	   }catch(e){
-          return err
+          {   
+			  console.log(err)
+			  return err
+	  	  }
 	   }
 	   
    }
