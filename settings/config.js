@@ -14,6 +14,57 @@ export default {
        mode: "dev",
        chackpermission: false
     },
+    styleImage:[
+       {
+        path: "article",
+        data_path: [
+          {
+            path: "logo",
+            data_path: [
+              {
+                size: [50,50],
+                path: "50x50"
+              },
+              {
+                size: [250,250],
+                path: "250x250"
+              },
+              {
+                size: [500,400],
+                path: "500x400"
+              },
+              {
+                size: [600,400],
+                path: "600x400"
+              },
+            ],
+          },
+          {
+            path: "slide",
+            data_path: [
+              {
+                size: [150,150],
+                path: "150x150"
+              },
+              {
+                size: [350,350],
+                path: "350x350"
+              },
+              {
+                size: [500,400],
+                path: "500x400"
+              },
+              {
+                size: [600,400],
+                path: "600x400"
+              },
+            ],
+          }
+          
+        ]
+        
+      }
+    ],
     permissions: {
       login: { 
         ticket: '',

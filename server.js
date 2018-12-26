@@ -5,6 +5,7 @@ import bodyParser       from  'body-parser'
 import path             from  'path'
 import express_graphql  from  'express-graphql'
 import mongoose         from 'mongoose'
+import fs               from 'fs'
 // Roote
 import IndexRoute    from  './routes/index'
 import IndexServices from './routes/services'
@@ -15,6 +16,12 @@ import config from './settings/config'
 import { errorType } from './settings/errors'
 // permisson
 import checkpermission from  './middlewar/check-permissions'
+
+
+// create directory if not exists
+
+
+
 
 
 
@@ -60,18 +67,18 @@ app.use('/graphql',checkpermission, express_graphql({
    graphiql: true,
    formatError: (err) => {
 	   let error = getErrorCode(err.message);
-	   try{
-		return ({ message: error.message, statusCode: error.statusCode})
-	   }catch(e){
-          {   
-			  console.log(err)
-			  return err
-	  	  }
+	    if(error){
+            return ({ message: error.message, statusCode: error.statusCode})
+        }else{
+            console.log(err)
+            return ({ message: "unknown error", statusCode: 501})
+        }
+	   
 	   }
 	   
    }
 
-}))
+))
 
 app.use('/services',IndexServices);
 app.use('/',IndexRoute);
@@ -80,4 +87,29 @@ app.use('/',IndexRoute);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.listen(4400, () => console.log('Server Now Running On Port 4400!'))
+app.listen(4400, () => {
+	console.log('Server Now Running On Port 4400!');
+
+    let prepare_dir = config.styleImage;
+    let root_path   = `./public/assets/image`;
+
+    for(let item of prepare_dir){
+        let super_dir = item.path;
+        if (!fs.existsSync(`${root_path}/${super_dir}`)){
+            fs.mkdirSync(`${root_path}/${super_dir}`);
+        }
+        for(let itm of item.data_path){
+            let second_dir = itm.path;
+            if (!fs.existsSync(`${root_path}/${super_dir}/${second_dir}`)){
+                fs.mkdirSync(`${root_path}/${super_dir}/${second_dir}`);
+            }
+            for(let im of itm.data_path){
+                let third_dir = `${root_path}/${super_dir}/${second_dir}/${im.path}`;
+                if (!fs.existsSync(third_dir)){
+                    fs.mkdirSync(third_dir);
+                }
+            }
+        }
+    }
+    
+})

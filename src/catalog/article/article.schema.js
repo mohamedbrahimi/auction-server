@@ -17,14 +17,16 @@ export const ArticleTypeDefs = `
  
   type Article {
     id: ID!
+    image: String
     label: String!
+    ref: String
     code: String
     manufacturingCountry: String!
     buyingPrice: String!
     sellingPrice: String!
     quantity: Int!
     guarantee: String
-    articleStatus: String!
+    articleStatus: String
     brand_id: String!
     category_id: String!
     status: Int
@@ -51,7 +53,9 @@ export const ArticleTypeDefs = `
   # do this for us, and it also means we can use the same
   # input on both the "addArticle" and "editArticle" methods.
   input ArticleInput {
+    image: String
     label: String!
+    ref: String
     code: String
     manufacturingCountry: String!
     buyingPrice: String!
