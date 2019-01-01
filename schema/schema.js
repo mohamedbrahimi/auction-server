@@ -8,7 +8,10 @@ import { roleResolvers, RoleTypeDefs } from '../src/role/role.schema';
 import { brandResolvers, BrandTypeDefs  } from '../src/catalog/brand/brand.schema';
 import { categoryResolvers, CategoryTypeDefs } from '../src/catalog/category/category.schema';
 import { articleResolvers, ArticleTypeDefs } from '../src/catalog/article/article.schema';
-import { galleryResolvers, GalleryTypeDefs } from '../src/catalog/gallery/gallery.shema';
+import { galleryResolvers, GalleryTypeDefs } from '../src/catalog/gallery/gallery.schema';
+import { dataSheetResolvers, DataSheetTypeDefs } from '../src/catalog/datasheet/datasheet.schema';
+import { categorykeyResolvers, CategorykeyTypeDefs } from '../src/catalog/category-key/category-key.schema';
+import { keyResolvers, KeyTypeDefs } from '../src/catalog/key/key.schema';
 const rootTypeDefs = `
         type Query
         type Mutation
@@ -23,12 +26,14 @@ export default makeExecutableSchema ({
     typeDefs: [
                rootTypeDefs, 
                userTypeDefs,     RoleTypeDefs,    BrandTypeDefs, 
-               CategoryTypeDefs, ArticleTypeDefs, GalleryTypeDefs
+               CategoryTypeDefs, ArticleTypeDefs, GalleryTypeDefs,
+               DataSheetTypeDefs, CategorykeyTypeDefs, KeyTypeDefs
               ],
 
     resolvers: _.merge(
                        userResolvers,     roleResolvers,    brandResolvers,
-                       categoryResolvers, articleResolvers, galleryResolvers
+                       categoryResolvers, articleResolvers, galleryResolvers,
+                       dataSheetResolvers, categorykeyResolvers, keyResolvers
                       )
 })
     

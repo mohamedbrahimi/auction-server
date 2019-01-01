@@ -1,8 +1,10 @@
-import Article   from '../src/catalog/article/article.model';
-import Gallery   from '../src/catalog/gallery/gallery.model';
-import base64Img from 'base64-img';
-import sharp     from 'sharp'; 
-import fs        from 'fs';
+import Article     from '../src/catalog/article/article.model';
+import Gallery     from '../src/catalog/gallery/gallery.model';
+import Categorykey from '../src/catalog/category-key/category-key.model';
+import Key         from '../src/catalog/key/key.model';
+import base64Img   from 'base64-img';
+import sharp       from 'sharp'; 
+import fs          from 'fs';
 
 import config    from './config';
 
@@ -79,8 +81,40 @@ export function generateStyleImage(base64,root_path,imageName, path = 'logo') {
      
     }
 
-  
 
+export async function createKeyCode(_idcat){
+   let category ;
+   let count   = await Key.countDocuments();
+   try{
+      category = await Categorykey.findById(_idcat);
+   }catch(err){
+       console.log("Err: can't create a code Key!")
+   }
+   
+   
+   count++;
+   let number      = constructFullNumber(6, `${count}`);
+   let datey       = new Date().getFullYear().toString().substr(2,2);
+   let random      = constructFullNumber(5, `${Math.floor(Math.random() * (99999 - 10)) + 10}`);
+   let prefix      = (category)?category.label.toString().substr(0,6).toUpperCase():"NNN";
+   
+   return `${prefix} ${random}${number} ${datey}`; 
+}
+ 
+    
+/**
+ * THIS FUNCTION WILL HELP US TO ADD ZERO'S TO A NUMBER.
+ * EX : IF WE HAVE 45 AND WE WANT TO DISPLAY THE NUMBER LIKE 0045 !
+ * WE JUST CALL constructFullNumber(4, '45')
+ */
+export function constructFullNumber(length, data)
+{
+   if(data.length < length) { 
+       data = `0${data}`;
+       return constructFullNumber(length, data);
+    }
+    else return data;
+}
 
 
 function getModel(path){
