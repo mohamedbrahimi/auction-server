@@ -91,7 +91,7 @@ articleSchema.pre('findOneAndUpdate', function(next) {
   let doc_id  = this.getQuery();
   let doc  = this.getUpdate(); 
   let img  = doc.image;
-  let bool = ((img.indexOf('data:image/png;base64,') >= 0)?true:false);
+  let bool = ((img && img.indexOf('data:image/png;base64,') >= 0)?true:false);
   if(!bool){
     delete doc.image;
     next();

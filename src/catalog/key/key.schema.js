@@ -1,5 +1,5 @@
 import Key from './key.model';
-
+import Categorykey from '../category-key/category-key.model';
 import jwt from 'jsonwebtoken';
 
 import config from '../../../settings/config';
@@ -24,6 +24,7 @@ export const KeyTypeDefs = `
     status: Int
     created_by: User
     created_at: String
+    category: Categorykey
   }
 
   input KeyFilterInput {
@@ -106,6 +107,12 @@ export const keyResolvers = {
       const res = await Key.findByIdAndUpdate(id, { archived: true });
       return res ? res : null;
     },
+    },
+    Key: {
+      category: async(key) => {
+        const  c = await Categorykey.findById(key.category_key);
+        return c?c:null
+      }
     }
-  }
+  } 
   

@@ -95,7 +95,7 @@ export async function createKeyCode(_idcat){
    count++;
    let number      = constructFullNumber(6, `${count}`);
    let datey       = new Date().getFullYear().toString().substr(2,2);
-   let random      = constructFullNumber(5, `${Math.floor(Math.random() * (99999 - 10)) + 10}`);
+   let random      = constructFullNumber(8, `${Math.random().toString(36).substring(2, 10).toUpperCase()}`);
    let prefix      = (category)?category.label.toString().substr(0,6).toUpperCase():"NNN";
    
    return `${prefix} ${random}${number} ${datey}`; 
