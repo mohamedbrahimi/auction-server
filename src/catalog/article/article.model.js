@@ -42,12 +42,10 @@ const articleSchema = new mongoose.Schema({
               default: '10/10'
           },
           brand_id:{
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: 'Brand',
+             type: String
           },
           category_id: {
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: 'Category',
+            type: String
           },
           status: {
             type: Number,

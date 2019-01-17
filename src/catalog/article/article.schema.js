@@ -41,11 +41,18 @@ export const ArticleTypeDefs = `
     limit: Int
     skip: Int
   }
+
+  input ArticleFilterField {
+    status : Int
+    category_id: String
+    brand_id: String
+    archived: Boolean
+  }
   # Extending the root Query type.
   extend type Query {
-    articles(filter: ArticleFilterInput): [Article]
+    articles(filterflied:ArticleFilterField, filter: ArticleFilterInput): [Article]
     article(id: String!): Article
-    countArticles: Int
+    countArticles(filterflied:ArticleFilterField): Int
     
   }
   # We do not need to check if any of the input parameters
@@ -84,8 +91,8 @@ export const ArticleTypeDefs = `
  */
 export const articleResolvers = {
   Query: {
-    articles: async (_, { filter = {} }, context) => {
-      const articles = await Article.find({archived: false}, null, filter);
+    articles: async (_, { filterflied= {},filter = {} }, context) => {
+      const articles = await Article.find(filterflied, null, filter);
       // notice that I have ": any[]" after the "Articles" variable?
       // That is because I am using TypeScript but you can remove
       // this and it will work normally with pure JavaScript
@@ -100,8 +107,8 @@ export const articleResolvers = {
        return null
       
     },
-    countArticles: async () => {
-      const count = await Article.countDocuments({archived: false});
+    countArticles: async (_, { filterflied= {}}, context) => {
+      const count = await Article.countDocuments(filterflied);
       return count
     }
   },

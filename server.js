@@ -87,8 +87,8 @@ app.use('/',IndexRoute);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.listen(4400, () => {
-	console.log('Server Now Running On Port 4400!');
+app.listen(config.server.port, () => {
+	console.log('Server Now Running On Port '+config.server.port+'!');
 
     let prepare_dir = config.styleImage;
     let root_path   = `./public/assets/image`;

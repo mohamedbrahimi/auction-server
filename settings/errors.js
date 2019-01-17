@@ -5,7 +5,9 @@ exports.errorName = {
    TRYCREATEUSER_DUPLICATEUSERNAME: 'TRYCREATEUSER_DUPLICATEUSERNAME',
    UNAUTHORIZEDUSERNAME: 'UNAUTHORIZEDUSERNAME',
    UNAUTHORIZEDPASSWORD: 'UNAUTHORIZEDPASSWORD',
-   TRYCREATEROLE_DUPLICATELABEL: 'TRYCREATEROLE_DUPLICATELABEL'
+   TRYCREATEROLE_DUPLICATELABEL: 'TRYCREATEROLE_DUPLICATELABEL',
+   TRYCREATECLIENT_DUPLICATEUSERNAME: 'TRYCREATECLIENT_DUPLICATEUSERNAME',
+   TRYCREATECLIENT_DUPLICATEMAIL: 'TRYCREATECLIENT_DUPLICATEMAIL'
 }
 
 exports.errorType = {
@@ -36,5 +38,14 @@ exports.errorType = {
     TRYCREATEROLE_DUPLICATELABEL: {
         message: 'Can\'t duplicate the label! try to change it.',
         statusCode: 501,
-    }
+    },
+    TRYCREATECLIENT_DUPLICATEUSERNAME: {
+        message: 'Can\'t duplicate the username! try to change it.',
+        statusCode: 500,
+    },
+    TRYCREATECLIENT_DUPLICATEMAIL: {
+        message: 'Can\'t duplicate the e-mail! try to change it.',
+        statusCode: 501,
+    },
+    
  }

@@ -9,6 +9,10 @@ const categorySchema = new mongoose.Schema({
             type: String,
             required: true,
           },
+          category_mother_id:{
+            type: String,
+            default: '---'
+          },
           created_at: {
             type: Date,
             default: Date.now

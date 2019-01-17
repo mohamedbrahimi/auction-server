@@ -17,6 +17,8 @@ export const CategoryTypeDefs = `
   type Category {
     id: ID!
     label: String!
+    category_mother_id: String
+    category_mother: Category
     created_by: User
     created_at: String
   }
@@ -38,7 +40,7 @@ export const CategoryTypeDefs = `
   # input on both the "addCategory" and "editCategory" methods.
   input CategoryInput {
     label: String
-
+    category_mother_id: String
 }
   # Extending the root Mutation type.
   extend type Mutation {
@@ -99,6 +101,15 @@ export const categoryResolvers = {
       const res = await Category.findByIdAndUpdate(id, { archived: true });
       return res ? res : null;
     },
-    }
+    },
+  Category: {
+    async category_mother(category) {
+      if (objectID.isValid(category.category_mother_id)) {
+        const cat = await Category.findById(category.category_mother_id);
+        return cat;
+      }
+      return null;
+   },
+  }
   }
   

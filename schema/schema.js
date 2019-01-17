@@ -12,6 +12,9 @@ import { galleryResolvers, GalleryTypeDefs } from '../src/catalog/gallery/galler
 import { dataSheetResolvers, DataSheetTypeDefs } from '../src/catalog/datasheet/datasheet.schema';
 import { categorykeyResolvers, CategorykeyTypeDefs } from '../src/catalog/category-key/category-key.schema';
 import { keyResolvers, KeyTypeDefs } from '../src/catalog/key/key.schema';
+import { auctionResolvers, AuctionTypeDefs } from '../src/catalog/auction/auction.schema';
+// mazaduse
+import { clientResolvers, ClientTypeDefs } from '../src/mazaduse/client/client.schema';
 const rootTypeDefs = `
         type Query
         type Mutation
@@ -27,13 +30,15 @@ export default makeExecutableSchema ({
                rootTypeDefs, 
                userTypeDefs,     RoleTypeDefs,    BrandTypeDefs, 
                CategoryTypeDefs, ArticleTypeDefs, GalleryTypeDefs,
-               DataSheetTypeDefs, CategorykeyTypeDefs, KeyTypeDefs
+               DataSheetTypeDefs, CategorykeyTypeDefs, KeyTypeDefs,
+               ClientTypeDefs, AuctionTypeDefs
               ],
 
     resolvers: _.merge(
                        userResolvers,     roleResolvers,    brandResolvers,
                        categoryResolvers, articleResolvers, galleryResolvers,
-                       dataSheetResolvers, categorykeyResolvers, keyResolvers
+                       dataSheetResolvers, categorykeyResolvers, keyResolvers,
+                       clientResolvers, auctionResolvers
                       )
 })
     

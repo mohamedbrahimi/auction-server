@@ -3,12 +3,27 @@
  * Replace these variables with environment variables
  * so that it reduces friction.
  */
+
 export default {
     mongodb: {
-      uri: 'mongodb://127.0.0.1:27017/e-auction',
+      uri: 'mongodb://127.0.0.1:27017/e-auction'
+    },
+    server: {
+      url: 'localhost',
+      port: 4400
+    },
+    client:{
+      admin:  'http://localhost:4220',
+      site: 'http://localhost:4550' 
     },
     token: {
       secret: 'e-auction-mazaduse',
+      secret_client: 'e-auction-mazaduse-client',
+      secret_client_confirm: 'e-auction-mazaduse-client-confirm'
+    },
+    mailling:{
+      username: "mazadusecpt@gmail.com",
+      password: "mazaduse2209"
     },
     debug: {
        mode: "dev",
