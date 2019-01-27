@@ -29,11 +29,16 @@ export const ClientTypeDefs = `
     limit: Int
     skip: Int
   }
+
+  input ClientFilterField { 
+    status : Int
+    archived: Boolean
+  }
   # Extending the root Query type.
   extend type Query {
-    clients(filter: ClientFilterInput): [Client]
+    clients(filterfield:ClientFilterField, filter: ClientFilterInput): [Client]
     client(id: String!): Client
-    countClients: Int
+    countClients(filterfield:ClientFilterField,): Int
     currentClient: Client
 
   }
@@ -67,10 +72,10 @@ export const ClientTypeDefs = `
  */
 export const clientResolvers = {
   Query: {
-    clients: async (_, { filter = {} },context) => {
+    clients: async (_, { filterfield= {}, filter = {} },context) => {
       try{
 
-        const clients = await Client.find({archived:false}, null, filter);
+        const clients = await Client.find(filterfield, null, filter);
         
         return clients;
       }catch(err){
@@ -82,14 +87,14 @@ export const clientResolvers = {
       if(objectID.isValid(id))
       {
         const client  = await Client.findById(id);
-        return client?Client:null;
+        return client?client:null;
       }{
         return null
       }
       
     },
-    countClients: async () => {
-      const count = await client.countDocuments({archived: false});
+    countClients: async (_, { filterfield= {}}, context) => {
+      const count = await Client.countDocuments(filterfield);
     },
     currentClient: async (_,{},context) => {
       try{

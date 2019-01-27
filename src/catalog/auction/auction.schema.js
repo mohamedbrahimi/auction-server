@@ -2,8 +2,10 @@ import Auction   from './auction.model';
 import Article   from '../article/article.model';
 import Categorykey   from '../category-key/category-key.model';
 
+import __ from 'lodash'
 import jwt from 'jsonwebtoken';
 import config from '../../../settings/config';
+import { errorName } from '../../../settings/errors';
 
 //import { errorName } from '../../settings/errors';
 /**
@@ -28,6 +30,7 @@ export const AuctionTypeDefs = `
     endDate: String
     minNumberParticipants: Int
     status: Int
+    closed: Int
     created_at: String
   }
 
@@ -40,13 +43,18 @@ export const AuctionTypeDefs = `
     category_key: String
     status: Int
     archived: Boolean
+    closed: Int
   }
+
+
   # Extending the root Query type.
   extend type Query {
     auctions(filterflied:AuctionFilterField, filter: AuctionFilterInput): [Auction]
     auction(id: String!): Auction
     countAuctions(filterflied:AuctionFilterField): Int
-    
+
+    auctionsFront(filterflied:AuctionFilterField, filterfront: ArticleFilterField, filter: AuctionFilterInput): [Auction]
+    countAuctionsFront(filterflied:AuctionFilterField, filterfront: ArticleFilterField): Int
   }
   # We do not need to check if any of the input parameters
   # exist with a "!" character. This is because mongoose will
@@ -60,6 +68,7 @@ export const AuctionTypeDefs = `
     currentPrice: String
     startDate: String
     endDate: String
+    status: Int
     minNumberParticipants: Int
 }
   # Extending the root Mutation type.
@@ -79,7 +88,7 @@ export const AuctionTypeDefs = `
  */
 export const auctionResolvers = {
   Query: {
-    auctions: async (_, { filterflied= {},filter = {} }, context) => {
+    auctions: async (_, { filterflied= {}, filter = {} }, context) => {
       const auctions = await Auction.find(filterflied, null, filter);
       // notice that I have ": any[]" after the "Auctions" variable?
       // That is because I am using TypeScript but you can remove
@@ -98,7 +107,41 @@ export const auctionResolvers = {
     countAuctions: async (_, { filterflied= {}}, context) => {
       const count = await Auction.countDocuments(filterflied);
       return count
-    }
+    },
+
+    auctionsFront: async (_, { filterflied= {}, filterfront= {}, filter = {} }, context) => {
+      filterflied.endDate =  { $gt : new Date() } 
+      const auctions = await Auction.find(filterflied);
+      const articles = await Article.find(filterfront);
+
+      let array = [];
+      await __.forEach(articles, async function(value) {
+            let index = await __.findIndex(auctions, { 'model_id': value.id });
+            if(index >= 0 ) array.push(auctions[index])
+          });
+         if(filter.limit && filter.skip)
+            return array.slice(filter.skip).slice(0, filter.limit);
+            else if(filter.limit)
+                    return array.slice(0,filter.limit);
+                    else if(filter.skip)
+                         return array.slice(filter.skip);
+                         else return array;
+    },
+
+    countAuctionsFront: async (_, { filterflied= {}, filterfront= {}}, context) => {
+      filterflied.endDate =  { $gt : new Date() } 
+      const auctions = await Auction.find(filterflied);
+      const articles = await Article.find(filterfront);
+
+      let array = [];
+      await __.forEach(articles, async function(value) {
+            let index = await __.findIndex(auctions, { 'model_id': value.id });
+            if(index >= 0 ) array.push(auctions[index])
+          });
+      return array.length;
+    },
+
+
   },
   Mutation: {
     addAuction: async (_, { input }, context) => {
@@ -109,10 +152,20 @@ export const auctionResolvers = {
         }catch(e){
           console.log('error: create a new Auction. can\'t get the jwt object');
         }
+        const exist    = await Auction.findOne({ model_id: input.model_id, archived: false, endDate: { $gt : new Date() } });
+        if(exist){
+          throw new Error(errorName.TRYCREATEAUCTION_DUPLICATEARTICLE);
+        }
+
         const auction  = await Auction.create(input);
         return auction;
     },
     editAuction: async (_, { id, input }) => {
+      const exist    = await Auction.findOne({ model_id: input.model_id, archived: false, endDate: { $gt : new Date() } });
+    
+       if(exist && exist._id != id){ //
+          throw new Error(errorName.TRYCREATEAUCTION_DUPLICATEARTICLE);
+        }
       const auction  = await Auction.findByIdAndUpdate(id, input);
       return auction;
     },
@@ -120,7 +173,8 @@ export const auctionResolvers = {
       const res = await Auction.findByIdAndUpdate(id, { archived: true });
       return res ? res : null;
     },
-    },
+
+  },
     Auction: {
         
      category: async(auction) => {

@@ -1,6 +1,8 @@
 import Article   from './article.model';
 import Brand     from '../brand/brand.model';
 import Category  from '../category/category.model';
+import Gallery   from '../gallery/gallery.model';
+import DataSheet   from '../datasheet/datasheet.model';
 
 import jwt from 'jsonwebtoken';
 import config from '../../../settings/config';
@@ -32,8 +34,11 @@ export const ArticleTypeDefs = `
     status: Int
     created_by: User
     brand: Brand
+    gallery: [Gallery]
+    dashsheet: [DataSheet]
     category: Category
     created_at: String
+
 
   }
 
@@ -134,20 +139,35 @@ export const articleResolvers = {
     },
     },
     Article: {
-        async brand(user) {
-          if (user.brand_id && objectID.isValid(user.brand_id)) {
-            const brand = await Brand.findById(user.brand_id);
+        async brand(article) {
+          if (article.brand_id && objectID.isValid(article.brand_id)) {
+            const brand = await Brand.findById(article.brand_id);
             return brand?brand:null;
           }
           return null;
        },
-       async category(user) {
-        if (user.category_id && objectID.isValid(user.category_id)) {
-            const category = await Category.findById(user.category_id);
+       async category(article) {
+        if (article.category_id && objectID.isValid(article.category_id)) {
+            const category = await Category.findById(article.category_id);
             return category?category:null;
           }
           return null;
      },
+       async gallery(article) {
+        if (article.id) {
+          const gallery = await Gallery.find({model_id: article.id, archived: false});
+          return gallery
+        }
+        return [];
+       },
+
+       async dashsheet(article) {
+        if (article.id) {
+          const dataSheet = await DataSheet.find({model_id: article.id, archived: false});
+          return dataSheet
+        }
+        return [];
+       }
     
        }
   }

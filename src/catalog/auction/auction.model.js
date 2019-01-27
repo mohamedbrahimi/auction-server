@@ -18,11 +18,10 @@ const auctionSchema = new mongoose.Schema({
             type: String,
           },
           currentPrice: {
-            type: String
+            type: String,
           },
           startDate: {
             type: Date,
-            default: false
           },
           endDate: {
             type: Date,
@@ -34,6 +33,14 @@ const auctionSchema = new mongoose.Schema({
           status:{
             type: Number,
             default: 1
+          },
+          closed: {
+            type: Number,
+            default: 0
+          },
+          archived: {
+           type: Boolean,
+           default: false
           },
           created_at: {
             type: Date,

@@ -41,6 +41,10 @@ export default {
                 path: "50x50"
               },
               {
+                size: [100,100],
+                path: "100x100"
+              },
+              {
                 size: [250,250],
                 path: "250x250"
               },
@@ -57,6 +61,11 @@ export default {
           {
             path: "slide",
             data_path: [
+              
+              {
+                size: [100,100],
+                path: "100x100"
+              },
               {
                 size: [150,150],
                 path: "150x150"
