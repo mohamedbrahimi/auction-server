@@ -1,4 +1,5 @@
 import Client from './client.model';
+import Key from '../../catalog/category-key/category-key.model';
 // import config
 import config from '../../../settings/config';
 import { sendMail } from '../../../settings/mailling';
@@ -22,6 +23,7 @@ export const ClientTypeDefs = `
     status: Int
     confirmed: Int
     created_at: String
+    keys: [Key]
     # Last name is not a required field so it 
     # does not need a "!" at the end.
   }
@@ -177,7 +179,17 @@ export const clientResolvers = {
         throw new Error(errorName.UNAUTHORIZEDUSERNAME);
       }
       
-},
+ },
+}, 
+Client: {
+  keys: async(client)=>{
+    if(client.id){
+       const keys = await Key.find({client_id: client.id, archived: false});
+       return keys;
+    }else {
+      return [];
     }
+  }
+}
   }
   

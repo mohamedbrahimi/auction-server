@@ -19,11 +19,12 @@ export const KeyTypeDefs = `
     code: String
     category_key: String
     client_id: String
-    article_id: String
+    auction_id: String
     consumed: Int
     status: Int
     created_by: User
     created_at: String
+    consumed_at: String
     category: Categorykey
   }
 
@@ -31,11 +32,22 @@ export const KeyTypeDefs = `
     limit: Int
     skip: Int
   }
+  input KeyFilterField {
+    client_id: String
+    status: Int
+    consumed: Int
+    archived: Boolean 
+    category_key: String
+  }
   # Extending the root Query type.
   extend type Query {
-    keys(filter: KeyFilterInput): [Key]
+    keys(filterfield: KeyFilterField ,filter: KeyFilterInput): [Key]
     key(id: String!): Key
-    countKeys: Int
+    countKeys(filterfield: KeyFilterField): Int
+
+    keysfront(filterfield: KeyFilterField ,filter: KeyFilterInput): [Key]
+    countKeysfront(filterfield: KeyFilterField): Int
+
     }
   # We do not need to check if any of the input parameters
   # exist with a "!" character. This is because mongoose will
@@ -44,7 +56,7 @@ export const KeyTypeDefs = `
   input KeyInput {
     category_key: String
     client_id: String
-    article_id: String
+    auction_id: String
     consumed: Int
     status: Int
 }
@@ -65,8 +77,8 @@ export const KeyTypeDefs = `
  */
 export const keyResolvers = {
   Query: {
-    keys: async (_, { filter = {} }, context) => {
-      const keys = await Key.find({archived: false}, null, filter);
+    keys: async (_, {filterfield = {}, filter = {} }, context) => {
+      const keys = await Key.find(filterfield, null, filter);
       // notice that I have ": any[]" after the "Keys" variable?
       // That is because I am using TypeScript but you can remove
       // this and it will work normally with pure JavaScript
@@ -81,10 +93,34 @@ export const keyResolvers = {
        return null
       
     },
-    countKeys: async () => {
-      const count = await Key.countDocuments({archived: false});
+    countKeys: async (_, {filterfield= {}}) => {
+      const count = await Key.countDocuments(filterfield);
       return count
-    }
+    },
+
+    keysfront: async (_, {filterfield = {}, filter = {} }, context) => {
+      const token      = context.headers.authorization;
+      try{
+        const decoded    = jwt.verify(token, config.token.secret_client);
+        const keys = await Key.find(Object.assign({client_id: decoded.id}, filterfield), null, filter);
+        return keys;
+      }catch(e){
+        return [];
+      }
+      
+    },
+    countKeysfront: async (_, {filterfield= {}}, context) => {
+      const token      = context.headers.authorization;
+      try{
+        const decoded  = jwt.verify(token, config.token.secret_client);
+        const count    = await Key.countDocuments(Object.assign({client_id: decoded.id}, filterfield));
+        return count
+      }catch(e){
+        return 0;
+      }
+
+      
+    },
   },
   Mutation: {
     addKey: async (_, { input }, context) => {

@@ -15,6 +15,7 @@ import { keyResolvers, KeyTypeDefs } from '../src/catalog/key/key.schema';
 import { auctionResolvers, AuctionTypeDefs } from '../src/catalog/auction/auction.schema';
 // mazaduse
 import { clientResolvers, ClientTypeDefs } from '../src/mazaduse/client/client.schema';
+import { messageResolvers, MessageTypeDefs } from '../src/mazaduse/message/message.schema';
 const rootTypeDefs = `
         type Query
         type Mutation
@@ -31,14 +32,14 @@ export default makeExecutableSchema ({
                userTypeDefs,     RoleTypeDefs,    BrandTypeDefs, 
                CategoryTypeDefs, ArticleTypeDefs, GalleryTypeDefs,
                DataSheetTypeDefs, CategorykeyTypeDefs, KeyTypeDefs,
-               ClientTypeDefs, AuctionTypeDefs
+               ClientTypeDefs, AuctionTypeDefs, MessageTypeDefs
               ],
 
     resolvers: _.merge(
                        userResolvers,     roleResolvers,    brandResolvers,
                        categoryResolvers, articleResolvers, galleryResolvers,
                        dataSheetResolvers, categorykeyResolvers, keyResolvers,
-                       clientResolvers, auctionResolvers
+                       clientResolvers, auctionResolvers, messageResolvers,
                       )
 })
     

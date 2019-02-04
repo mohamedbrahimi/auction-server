@@ -1,5 +1,6 @@
 import Article     from '../src/catalog/article/article.model';
 import Gallery     from '../src/catalog/gallery/gallery.model';
+import Message     from '../src/mazaduse/message/message.model';
 import Categorykey from '../src/catalog/category-key/category-key.model';
 import Key         from '../src/catalog/key/key.model';
 import base64Img   from 'base64-img';
@@ -121,6 +122,7 @@ function getModel(path){
     switch(path){
         case "slide": return Gallery; break;
         case "logo" : return Article; break;
+        case "attached_file": return Message; break;
     }
 }
 
@@ -130,5 +132,22 @@ function getModelFieldImageName(path){
         case "logo" : return 'image'; break;
     }
 }
+
+export function removeParticularImage(field, path, id_obj){
+    getModel(path).findById(id_obj)  
+    .exec()
+    .then((article) => {
+
+      let file_path   = article[field]; 
+      let original    = `public${file_path}`;
+      try{
+          if(fs.existsSync(original))fs.unlinkSync(original);
+      }catch(e){
+          console.log('can\'t remove original file');
+      }
+})
+}
+ 
+
 
 

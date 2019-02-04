@@ -19,7 +19,9 @@ export default {
     token: {
       secret: 'e-auction-mazaduse',
       secret_client: 'e-auction-mazaduse-client',
-      secret_client_confirm: 'e-auction-mazaduse-client-confirm'
+      secret_client_confirm: 'e-auction-mazaduse-client-confirm',
+      secret_client_confirm: 'e-auction-mazaduse-client-confirm',
+      secret_passwordreset_client: 'e-auction-mazaduse-passwordreset_adherent'
     },
     mailling:{
       username: "mazadusecpt@gmail.com",

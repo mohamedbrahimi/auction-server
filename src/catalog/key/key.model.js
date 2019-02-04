@@ -15,7 +15,7 @@ const keySchema = new mongoose.Schema({
           client_id: {
             type: String
           },
-          article_id:{
+          auction_id:{
             type: String
           },
           consumed:{
@@ -25,6 +25,9 @@ const keySchema = new mongoose.Schema({
           status:{
              type: Number,
              default: 1 
+          },
+          consumed_at: {
+            type: Date
           },
           created_at: {
             type: Date,

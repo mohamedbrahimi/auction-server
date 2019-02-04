@@ -6,13 +6,11 @@ import config    from './config';
 
 
 
-export function sendMail(data)
+export function sendMail(data, type="confirmation")
 {
     
     
-            let token = jwt.sign({
-                username:data.username,
-                },config.token.secret_client_confirm, {expiresIn : '900000'});
+            let token = getToken(data, type);
              
                 
             let link  = `${config.client.site}/confirm/${token}`;   
@@ -33,36 +31,74 @@ export function sendMail(data)
                         pass: config.mailling.password
                     }
                 }); 
-
+ 
                 // setup email data with unicode symbols
-                let mailOptions = {
-                    from: '"Mazaduse" <'+config.mailling.username+'>', // sender address
-                    to: `${mail}`, // list of receivers
-                    subject: 'Confirmez votre compte ✔', // Subject line
-                    text: `Salut ${username},
-                        Nous avons le plaisir de vous confirmer que votre  inscription sur mazaduse.dz a bien été 
-                        prise en compte.
-                        Plus qu'une étape pour acceder au site.
-                        Veuillez cliquer sur le lien ci-dessous afin de confirmer votre adresse mail :
-                        ${link}
-                        Ce lien expirera dans 15 minutes et ne peut être utilisé qu’une seule fois.
-                        
-                        Merci,
-                        L’équipe de gestion des comptes Mazaduse. 
-                        `, // plain text body
-                    html: `<h1>Salut ${username},</h1>
-                    <p>Nous avons le plaisir de vous confirmer que votre  inscription sur mazaduse.dz a bien été 
-                    prise en compte.</p>
-                    <p>Plus qu'une étape pour acceder au site.</p>
-                    <p>Veuillez cliquer sur le lien ci-dessous afin de confirmer votre adresse mail : </p>
-                    ${link}
-                    <br>
-                    <b>Ce lien expirera dans 15 minutes et ne peut être utilisé qu’une seule fois.</b>
-                    
-                    
-                    <p>Merci,</p>
-                    <b>L’équipe de gestion des comptes Mazaduse.</b>` // html body
-                };
+                let mailOptions; 
+                switch(type){
+                    case "confirmation" : {
+                        mailOptions = {
+                            from: '"mazadus" <'+config.mailling.username+'>', // sender address
+                            to: `${mail}`, // list of receivers
+                            subject: 'Confirmez votre compte ✔', // Subject line
+                            html: `<h1>Salut ${username},</h1>
+                            <p>Nous avons le plaisir de vous confirmer que votre  inscription sur mazadus.dz a bien été 
+                            prise en compte.</p>
+                            <p>Plus qu'une étape pour acceder au site.</p>
+                            <p>Veuillez cliquer sur le lien ci-dessous afin de confirmer votre adresse mail : </p>
+                            ${link}
+                            <br>
+                            <b>Ce lien expirera dans 60 minutes et ne peut être utilisé qu’une seule fois.</b>
+                            
+                            
+                            <p>Merci,</p>
+                            <b>L’équipe de gestion des comptes mazadus.</b>` // html body
+                        };
+                    }; break;
+                    case "demandecredit" : {
+                        mailOptions = {
+                            from: '"mazadus" <'+config.mailling.username+'>', // sender address
+                            to: `${mail}`, // list of receivers
+                            subject: 'Rechargement 💳', // Subject line
+                            html: `<h1>Salut ${username},</h1>
+                            <p>Nous avons le plaisir de vous confirmer que votre  demande a bien été 
+                            enregistrée.</p>
+                            <p>Votre message va bientôt prise en compte par l'équipe de gestion des clés mazadus</b>
+                            
+                            
+                            <p>Merci,</p>
+                            <b>L’équipe de gestion des clés mazadus.</b>` // html body
+                        };
+                    }; break;
+                    case "demandeconfirm" : {
+                        mailOptions = {
+                            from: '"mazadus" <'+config.mailling.username+'>', // sender address
+                            to: `${mail}`, // list of receivers
+                            subject: 'Rechargement 💳', // Subject line
+                            html: `<h1>Salut ${username},</h1>
+                            <p>Nous avons le plaisir de vous confirmer que votre commande d'achat des clés à bien été confirmée,</p>
+                            <p> vous pouver vérifier ça à travers votre compte sur mazadus.</p>
+                            
+                            
+                            <p>Merci,</p>
+                            <b>L’équipe de gestion des clés mazadus.</b>` // html body
+                        };
+                    }; break;
+                    case "demandecancel" : {
+                        mailOptions = {
+                            from: '"mazadus" <'+config.mailling.username+'>', // sender address
+                            to: `${mail}`, // list of receivers
+                            subject: 'Rechargement 😶', // Subject line
+                            html: `<h1>Salut ${username},</h1>
+                            <p>Votre de demande de rechargement à été refusée pour des raisons réglementaire</p>,
+                            <p>veuillez vérifier et corriger votre demande sur votre compte sinon vous pouvez contacter le service client.</p>
+                            
+                            
+                            <p>Merci,</p>
+                            <b>L’équipe de gestion des clés mazadus.</b>` // html body
+                        };
+                    }; break;
+                }
+        
 
                 // send mail with defined transport object
                 transporter.sendMail(mailOptions, (error, info) => {
@@ -87,12 +123,29 @@ export function sendMail(data)
                     // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
                 });
             }); 
-
-          
-    
+}
 
 
+function getToken(data, type){
+     
+    switch(type){
+       case "confirmation": {
+         let token =    jwt.sign({
+            username:data.username,
+            },config.token.secret_client_confirm, {expiresIn : '1h'});
 
+           return token;
+    };
+       case "restpassword": {
+        let token = jwt.sign({
+            username:data.username,
+            },config.token.secret_passwordreset_client, {expiresIn : '1h'});
+
+           return token;
+       };
+
+       default: return ""; break;
+    }
 }
 
 
