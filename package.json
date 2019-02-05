@@ -2,13 +2,13 @@
   "name": "server",
   "version": "1.0.0",
   "description": "server side",
-  "main": "server.js",
+  "main": "server_mazadus.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "babel-watch server.js",
+    "dev": "babel-watch server_mazadus.js",
     "clean": "rm -rf dist/*",
     "build": "npm run clean && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
-    "start": "node dist/server.js"
+    "start": "node dist/server_mazadus.js"
   },
   "author": "BRAHIMI MOHAMED",
   "license": "ISC",
