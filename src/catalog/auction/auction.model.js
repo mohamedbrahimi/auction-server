@@ -4,8 +4,11 @@ import mongoose from 'mongoose'
  * validate the data sent to our database.
  */
 const auctionSchema = new mongoose.Schema({
-         
+
           model_id: {
+            type: String,
+          },
+          client_id:{
             type: String,
           },
           category_key: {
@@ -45,6 +48,10 @@ const auctionSchema = new mongoose.Schema({
           created_at: {
             type: Date,
             default: Date.now
+          },
+          updated_at: {
+              type: Date,
+              default: Date.now
           },
           created_by: {
             type: String,

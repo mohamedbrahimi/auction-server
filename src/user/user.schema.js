@@ -157,7 +157,7 @@ export const userResolvers = {
         let archived_time = new Date();
         let archived_username = `archived_${archived_name}_${archived_time}`;
         
-        const res = await User.findByIdAndUpdate(id, { archived: true, status: false, username: archived_username});
+        const res = await User.findByIdAndUpdate(id, { archived: true, status: 0, username: archived_username});
         return res ? res : null;
         
       }else{

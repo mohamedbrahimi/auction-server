@@ -40,7 +40,7 @@ export function sendMail(data, type="confirmation")
                             from: '"mazadus" <'+config.mailling.username+'>', // sender address
                             to: `${mail}`, // list of receivers
                             subject: 'Confirmez votre compte ✔', // Subject line
-                            html: `<h1>Salut ${username},</h1>
+                            html: `<h3>Salut ${username},</h3>
                             <p>Nous avons le plaisir de vous confirmer que votre  inscription sur mazadus.dz a bien été 
                             prise en compte.</p>
                             <p>Plus qu'une étape pour acceder au site.</p>
@@ -59,7 +59,7 @@ export function sendMail(data, type="confirmation")
                             from: '"mazadus" <'+config.mailling.username+'>', // sender address
                             to: `${mail}`, // list of receivers
                             subject: 'Rechargement 💳', // Subject line
-                            html: `<h1>Salut ${username},</h1>
+                            html: `<h3>Salut ${username},</h3>
                             <p>Nous avons le plaisir de vous confirmer que votre  demande a bien été 
                             enregistrée.</p>
                             <p>Votre message va bientôt prise en compte par l'équipe de gestion des clés mazadus</b>
@@ -74,7 +74,7 @@ export function sendMail(data, type="confirmation")
                             from: '"mazadus" <'+config.mailling.username+'>', // sender address
                             to: `${mail}`, // list of receivers
                             subject: 'Rechargement 💳', // Subject line
-                            html: `<h1>Salut ${username},</h1>
+                            html: `<h3>Salut ${username},</h3>
                             <p>Nous avons le plaisir de vous confirmer que votre commande d'achat des clés à bien été confirmée,</p>
                             <p> vous pouver vérifier ça à travers votre compte sur mazadus.</p>
                             
@@ -88,13 +88,37 @@ export function sendMail(data, type="confirmation")
                             from: '"mazadus" <'+config.mailling.username+'>', // sender address
                             to: `${mail}`, // list of receivers
                             subject: 'Rechargement 😶', // Subject line
-                            html: `<h1>Salut ${username},</h1>
+                            html: `<h3>Salut ${username},</h3>
                             <p>Votre de demande de rechargement à été refusée pour des raisons réglementaire</p>,
                             <p>veuillez vérifier et corriger votre demande sur votre compte sinon vous pouvez contacter le service client.</p>
                             
                             
                             <p>Merci,</p>
                             <b>L’équipe de gestion des clés mazadus.</b>` // html body
+                        };
+                    }; break;
+                    case "addorder" : {
+                        mailOptions = {
+                            from: '"mazadus" <'+config.mailling.username+'>', // sender address
+                            to: `${mail}`, // list of receivers
+                            subject: 'Commander un article 👌', // Subject line
+                            html: `<h3>Salut ${username},</h3>
+                            <p>Nous avons le plaisir de vous informer que votre commande a été bien enregistré,</p>
+                            <p>vous pouvez constater regulièrement l'etat de votre commande à travers votre compte mazadus. </p>
+                            <p>Merci,</p>
+                            <b>L’équipe de gestion des commandes mazadus.</b>` // html body
+                        };
+                    }; break;
+                    case "addparticipation" : {
+                        mailOptions = {
+                            from: '"mazadus" <'+config.mailling.username+'>', // sender address
+                            to: `${mail}`, // list of receivers
+                            subject: 'Participer à l\'enchère 🤚', // Subject line
+                            html: `<h3>Salut ${username},</h3>
+                            <p>Nous avons le plaisir de vous confirmer que votre participation à l'enchère à été enregistré.</p>
+                            <p>vous aurez une notification dès la fin de l'enchère si vous etez le gagnant. </p>
+                            <p>Merci,</p>
+                            <b>L’équipe de gestion des enchères mazadus.</b>` // html body
                         };
                     }; break;
                 }

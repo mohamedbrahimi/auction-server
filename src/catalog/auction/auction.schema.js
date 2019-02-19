@@ -1,7 +1,7 @@
 import Auction   from './auction.model';
 import Article   from '../article/article.model';
 import Categorykey   from '../category-key/category-key.model';
-
+import Bid from '../../mazaduse/bid/bid.model';
 import __ from 'lodash'
 import jwt from 'jsonwebtoken';
 import config from '../../../settings/config';
@@ -16,11 +16,13 @@ import mongoose from 'mongoose';
 const objectID = mongoose.Types.ObjectId;
 
 export const AuctionTypeDefs = `
- 
+
   type Auction {
     id: ID!
     model_id: String
+    client_id: String
     model: Article
+    bids: [Bid]
     category_key: String
     category: Categorykey
     priceStart: String
@@ -93,16 +95,16 @@ export const auctionResolvers = {
       // notice that I have ": any[]" after the "Auctions" variable?
       // That is because I am using TypeScript but you can remove
       // this and it will work normally with pure JavaScript
-      
+
       return auctions;
     },
     auction: async (_, { id }) => {
       if(objectID.isValid(id)){
         const auction  = await Auction.findById(id);
         return auction;
-      }else 
+      }else
        return null
-      
+
     },
     countAuctions: async (_, { filterflied= {}}, context) => {
       const count = await Auction.countDocuments(filterflied);
@@ -110,7 +112,7 @@ export const auctionResolvers = {
     },
 
     auctionsFront: async (_, { filterflied= {}, filterfront= {}, filter = {} }, context) => {
-      filterflied.endDate =  { $gt : new Date() } 
+      filterflied.endDate =  { $gt : new Date() }
       const auctions = await Auction.find(filterflied);
       const articles = await Article.find(filterfront);
 
@@ -129,7 +131,7 @@ export const auctionResolvers = {
     },
 
     countAuctionsFront: async (_, { filterflied= {}, filterfront= {}}, context) => {
-      filterflied.endDate =  { $gt : new Date() } 
+      filterflied.endDate =  { $gt : new Date() }
       const auctions = await Auction.find(filterflied);
       const articles = await Article.find(filterfront);
 
@@ -162,7 +164,7 @@ export const auctionResolvers = {
     },
     editAuction: async (_, { id, input }) => {
       const exist    = await Auction.findOne({ model_id: input.model_id, archived: false, endDate: { $gt : new Date() } });
-    
+
        if(exist && exist._id != id){ //
           throw new Error(errorName.TRYCREATEAUCTION_DUPLICATEARTICLE);
         }
@@ -176,7 +178,7 @@ export const auctionResolvers = {
 
   },
     Auction: {
-        
+
      category: async(auction) => {
         if (auction.category_key && objectID.isValid(auction.category_key)) {
             const  c = await Categorykey.findById(auction.category_key);
@@ -191,8 +193,14 @@ export const auctionResolvers = {
           }
           return null;
      },
-     
-    
+     bids: async(auction) => {
+      if (auction.id && objectID.isValid(auction.id)) {
+          const  bids = await Bid.find({ auction_id: auction.id }, null, { limit: 3}).sort({created_at:-1});
+          return bids?bids:null
+        }
+        return null;
+   },
+
+
        }
   }
-  

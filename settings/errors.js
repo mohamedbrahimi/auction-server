@@ -8,10 +8,26 @@ exports.errorName = {
    TRYCREATEROLE_DUPLICATELABEL: 'TRYCREATEROLE_DUPLICATELABEL',
    TRYCREATECLIENT_DUPLICATEUSERNAME: 'TRYCREATECLIENT_DUPLICATEUSERNAME',
    TRYCREATECLIENT_DUPLICATEMAIL: 'TRYCREATECLIENT_DUPLICATEMAIL',
+   TRYCREATECLIENT_DUPLICATEPHONE: 'TRYCREATECLIENT_DUPLICATEPHONE',
    TRYCREATEAUCTION_DUPLICATEARTICLE: 'TRYCREATEAUCTION_DUPLICATEARTICLE',
+
+   TRYADDNEWORDER_NOTHAVEAKEY: 'TRYADDNEWORDER_NOTHAVEAKEY',
+   TRYADDNEWORDER_INSUFFICIENTQUANTITY: 'TRYADDNEWORDER_INSUFFICIENTQUANTITY',
+   TRYADDPARTICIPATION_NOTHAVEAKEY: 'TRYADDPARTICIPATION_NOTHAVEAKEY',
+   TRYADDPARTICIPATION_EXISTSONE: 'TRYADDPARTICIPATION_EXISTSONE',
+
+   TRYADD_ACTIONOFAUCTION: 'TRYADD_ACTIONOFAUCTION',
+
+
+   ERRORSYSTEME: 'ERRORSYSTEM'
+
 }
 
 exports.errorType = {
+    ERRORSYSTEME: {
+        message: 'ERROR System!!!',
+        statusCode: 505,
+    },
     UNAUTHORIZED: {
         message: 'Authentication is needed to get requested response.',
         statusCode: 401,
@@ -48,9 +64,36 @@ exports.errorType = {
         message: 'Can\'t duplicate the e-mail! try to change it.',
         statusCode: 501,
     },
+    TRYCREATECLIENT_DUPLICATEPHONE: {
+        message: 'Can\'t duplicate the phone! try to change it.',
+        statusCode: 502,
+    },
+
     TRYCREATEAUCTION_DUPLICATEARTICLE: {
         message: 'Can\'t duplicate the auction with existing article id.',
         statusCode: 501, 
+    }
+
+    ,
+    TRYADDNEWORDER_NOTHAVEAKEY: {
+        message: 'Can\'t add new order, you don\'t have a key with the same category.',
+        statusCode: 402, 
+    },
+    TRYADDPARTICIPATION_NOTHAVEAKEY: {
+        message: 'Can\'t participate to this auction, don\'t have a kay with the same category.',
+        statusCode: 403, 
+    },
+    TRYADDPARTICIPATION_EXISTSONE:{
+        message: 'Can\'t participate to this auction, don\'t have a kay with the same category.',
+        statusCode: 502, 
+    },
+    TRYADDNEWORDER_INSUFFICIENTQUANTITY: {
+        message: 'Can\'t add new order, insufficient quantity',
+        statusCode: 404,  
+    },
+    TRYADD_ACTIONOFAUCTION: {
+        message: 'Can\'t add new action',
+        statusCode: 405,  
     }
     
  }

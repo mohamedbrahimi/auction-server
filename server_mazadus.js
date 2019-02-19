@@ -6,6 +6,7 @@ import path             from  'path'
 import express_graphql  from  'express-graphql'
 import mongoose         from 'mongoose'
 import fs               from 'fs'
+
 // Roote
 import IndexRoute    from  './routes/index'
 import IndexServices from './routes/services'
@@ -14,6 +15,7 @@ import schema     from  './schema/schema';
 // Settings
 import config from './settings/config'
 import { errorType } from './settings/errors'
+import { initSocket } from './settings/socket/init';
 // permisson
 import checkpermission from  './middlewar/check-permissions'
 
@@ -87,7 +89,14 @@ app.use('/',IndexRoute);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.listen(config.server.port, () => {
+const http = require('http').Server(app);
+const io   = require('socket.io')(http);
+io.on('connection', (socket) => {
+    initSocket(io, socket);
+  });
+ 
+  
+http.listen(config.server.port, () => {
 	console.log('Server Now Running On Port '+config.server.port+'!');
 
     let prepare_dir = config.styleImage;
