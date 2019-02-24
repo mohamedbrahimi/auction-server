@@ -94,6 +94,7 @@ export const userResolvers = {
     },
     countusers: async () => {
       const count = await User.countDocuments({archived: false});
+      return count
     },
     currentUser: async (_,{},context) => {
       try{

@@ -127,9 +127,9 @@ export function sendMail(data, type="confirmation")
                 // send mail with defined transport object
                 transporter.sendMail(mailOptions, (error, info) => {
                     if (error) {
-                        res.status(501).send('send error!');
+                        //res.status(501).send('send error!');
                         //console.log(error);
-                        return console.log(error);
+                        return error;
                     }
                     else if(info)
                     {
@@ -137,12 +137,13 @@ export function sendMail(data, type="confirmation")
                         // Preview only available when sending through an Ethereal account
                         //console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
                 
-          
-                        res.status(200).json({'send':'200!'});
+                        return info
+                        //res.status(200).json({'send':'200!'});
                     }else {
-                        res.status(401).send('send error!, empty info');
+                        //res.status(401).send('send error!, empty info');
+                        return null
                     }
-                
+                 
                     // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
                     // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
                 });

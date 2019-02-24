@@ -15,6 +15,7 @@ import { keyResolvers, KeyTypeDefs } from '../src/catalog/key/key.schema';
 import { auctionResolvers, AuctionTypeDefs } from '../src/catalog/auction/auction.schema';
 // mazaduse
 import { clientResolvers, ClientTypeDefs } from '../src/mazaduse/client/client.schema';
+import { profileResolvers, ProfileTypeDefs } from '../src/mazaduse/client/profile.schema';
 import { messageResolvers, MessageTypeDefs } from '../src/mazaduse/message/message.schema';
 import { orderResolvers, OrderTypeDefs } from '../src/mazaduse/order/order.schema';
 import { participationResolvers, ParticipationTypeDefs } from '../src/mazaduse/participation/participation.schema';
@@ -36,7 +37,8 @@ export default makeExecutableSchema ({
                CategoryTypeDefs, ArticleTypeDefs, GalleryTypeDefs,
                DataSheetTypeDefs, CategorykeyTypeDefs, KeyTypeDefs,
                ClientTypeDefs, AuctionTypeDefs, MessageTypeDefs,
-               OrderTypeDefs, ParticipationTypeDefs, BidTypeDefs
+               OrderTypeDefs, ParticipationTypeDefs, BidTypeDefs,
+               ProfileTypeDefs
               ],
 
     resolvers: _.merge(
@@ -44,7 +46,8 @@ export default makeExecutableSchema ({
                        categoryResolvers, articleResolvers, galleryResolvers,
                        dataSheetResolvers, categorykeyResolvers, keyResolvers,
                        clientResolvers, auctionResolvers, messageResolvers,
-                       orderResolvers, participationResolvers, bidResolvers
+                       orderResolvers, participationResolvers, bidResolvers,
+                       profileResolvers
 
                       )
 })

@@ -70,8 +70,8 @@ export const tryTuUpgradeStatusOrder = async (status) => {
        case 3 :  resolve(4);break;
        case 4 :  resolve(5);break;
        case 5 :  resolve(6);break;
-       case '1e' : resolve('2e');break;
-       case '2e' : resolve('3e');break;
+       case -501 : resolve(-601);break;
+       case -601 : resolve(-701);break;
        default : {
          resolve(null);
        }; break;

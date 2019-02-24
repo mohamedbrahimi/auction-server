@@ -1,4 +1,5 @@
 import Client from './client.model';
+import Profile from './profile.model';
 import Key from '../../catalog/category-key/category-key.model';
 // import config
 import config from '../../../settings/config';
@@ -25,6 +26,7 @@ export const ClientTypeDefs = `
     confirmed: Int
     created_at: String
     keys: [Key]
+    profile: Profile
     # Last name is not a required field so it 
     # does not need a "!" at the end.
   }
@@ -61,6 +63,7 @@ export const ClientTypeDefs = `
   extend type Mutation {
     addClient(input: ClientInput!): Client
     editClient(id: String!, input: ClientInput!): Client
+    editSelfClient(input: ClientInput!): Client
     deleteClient(id: String!): Client
     loginClient(username: String!, password: String!): String
   }
@@ -99,6 +102,7 @@ export const clientResolvers = {
     },
     countClients: async (_, { filterfield= {}}, context) => {
       const count = await Client.countDocuments(filterfield);
+      return count;
     },
     currentClient: async (_,{},context) => {
       try{
@@ -163,6 +167,44 @@ export const clientResolvers = {
       return client;
       
     },
+    editSelfClient: async (_, { input }, context) => {
+      let token;
+      let decoded;
+      try{
+         token      = context.headers.authorization;
+         decoded    = jwt.verify(token, config.token.secret_client);
+      }catch(err){
+        throw new Error(errorName.UNAUTHORIZED); ;
+      }
+        const id         = decoded.id;
+        const old         = await Client.findById(id);
+        input.username   = input.username.trim().toLowerCase();
+        input.mail       = input.mail.trim().toLowerCase();
+        input.phone      = input.phone.trim().toLowerCase();
+  
+        if(old.password != input.password)
+          input.password   = Client.hashPassword(input.password);
+        
+          const exist_username = await Client.findOne({username: input.username});
+          const exist_mail     = await Client.findOne({mail: input.mail});
+          const exist_phone    = await Client.findOne({phone: input.phone});
+  
+        if(old && old.username != input.username &&  exist_username){
+          throw new Error(errorName.TRYCREATECLIENT_DUPLICATEUSERNAME);
+        }
+        if(old && old.mail != input.mail &&  exist_mail){
+          throw new Error(errorName.TRYCREATECLIENT_DUPLICATEMAIL);
+        }
+        if(old && old.phone != input.phone &&  exist_phone){
+          throw new Error(errorName.TRYCREATECLIENT_DUPLICATEPHONE);
+        }
+        
+        const client  = await Client.findByIdAndUpdate(id, input);
+        return client;
+      
+    
+      
+    },
     deleteClient: async (_, { id }) => {
       let client =  await Client.findOne({_id: id, archived: false});
       if(client){
@@ -205,7 +247,15 @@ Client: {
     }else {
       return [];
     }
-  }
+  },
+  profile: async(client)=>{
+    if(client.id){
+       const profile = await Profile.findOne({client_id: client.id, archived: false});
+       return profile;
+    }else {
+      return null;
+    }
+  },
 }
   }
   

@@ -56,12 +56,15 @@ export const OrderTypeDefs = `
     category_key: String
     status: Int
     client_id: String
+    orders_ids: [String],
+    upgrade: Boolean
   }
   # Extending the root Query type.
   extend type Query {
     orders(filterfield:OrderFilterField, filter: OrderFilterInput): [Order]
     order(id: String!): Order
     countOrders(filterfield:OrderFilterField,): Int
+    
 
     orders_front(filterfield:OrderFilterField, filter: OrderFilterInput): [Order]
     countOrders_front(filterfield:OrderFilterField,): Int
@@ -90,6 +93,8 @@ export const OrderTypeDefs = `
   extend type Mutation {
     addOrder(input: OrderInput!): Order
     editOrder(id: String!, input: OrderInput!): Order
+    printOrders(filterfield: OrderFilterField): [Order]
+    upgradeOrders(filterfield: OrderFilterField): [Order]
     deleteOrder(id: String!): Order
   }
 `;
@@ -198,25 +203,27 @@ export const orderResolvers = {
           const order    = await Order.findById(id);
           const quantity = order.quantity - input.quantity;
           const article  = await Article.findById(order.article_id);
-
           if(article.quantity < (input.quantity - order.quantity) + 1){
             throw new Error(errorName.TRYADDNEWORDER_INSUFFICIENTQUANTITY);
           }else{
                 switch(input.status){
                     case -1   : {
-                      if (order.status != -1){
+                      if (order.status != -1 && order.status != 3){
                           await Article.findByIdAndUpdate(order.article_id, { $inc: { quantity: order.quantity } });
                         if(order.status == 0){
                           await Key.findByIdAndUpdate(order.key_id, { consumed: 0 });
                         }
                         const odr = await Order.findByIdAndUpdate(order._id, { status: -1 });
                         return odr;
+                      }else if( order.status == 3){
+                        const odr = await Order.findByIdAndUpdate(order._id, { status: -501 });
+                        return odr;
                       }
                     } break;
-                    case "3e" : {
-                      if (order.status != "3e"){
+                    case -701 : {
+                      if (order.status != -701){
                           await Article.findByIdAndUpdate(order.article_id, { $inc: { quantity: order.quantity } });
-                          const odr = await Order.findByIdAndUpdate(order._id, { status: "3e" });
+                          const odr = await Order.findByIdAndUpdate(order._id, { status: -701 });
                           return odr;
                       }
                     } break;
@@ -239,6 +246,48 @@ export const orderResolvers = {
     
           return null;
     },
+    printOrders: async(_, { filterfield= {}}, context) => {
+         const orderIds = filterfield.orders_ids;
+               delete filterfield.orders_ids;
+         const upgrade  = filterfield.upgrade;
+               delete filterfield.upgrade;
+         if(filterfield.status == 1 && upgrade){
+          const orders = await Order.find( Object.assign({ _id: { $in : orderIds } }, filterfield) );
+          await Order.updateMany(Object.assign({ _id: { $in : orderIds } }, filterfield),     { $set: { status : 2 } });
+          return orders;
+         }else{
+          const orders = await Order.find( Object.assign({ _id: { $in : orderIds } }, filterfield) );
+          return orders;
+         }
+         
+    },
+    upgradeOrders: async(_, { filterfield= {}}, context) => {
+      
+      const orderIds = filterfield.orders_ids;
+            delete filterfield.orders_ids;
+      const status  = await tryTuUpgradeStatusOrder(filterfield.status);
+      if(status){
+        await Order.updateMany(Object.assign({ _id: { $in : orderIds } }, filterfield),     { $set: { status : status } });
+        filterfield.status = status;
+        const orders = await Order.find(Object.assign({ _id: { $in : orderIds } }, filterfield))
+      if(status == -701 && orders){
+        for(let item of orders){
+          let article = await Article.findByIdAndUpdate(item.article_id, { $inc: { quantity: item.quantity } })
+        }
+        return orders;
+      }else{
+        return orders;
+      }
+      }else{
+        return [];
+      }
+      
+      
+      
+      
+      
+      
+ },
     deleteOrder: async (_, { id }) => {
         
         const res = await Order.findByIdAndUpdate(id, { archived: true});
