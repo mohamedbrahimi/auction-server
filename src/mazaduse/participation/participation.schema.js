@@ -1,4 +1,5 @@
 import Participation        from './participation.model';
+import Bid from '../bid/bid.model';
 import Client       from '../client/client.model';
 import Auction       from '../../catalog/auction/auction.model';
 import Categorykey   from '../../catalog/category-key/category-key.model'
@@ -30,6 +31,7 @@ export const ParticipationTypeDefs = `
     key: Key
     auction: Auction
     category: Categorykey
+    bid: Bid
 
     # Last name is not a required field so it
     # does not need a "!" at the end.
@@ -175,6 +177,15 @@ Participation: {
     }else{
       return null
     }
-  }
+  },
+  bid: async(participation) => {
+
+    if(participation && participation.id){
+      const bid = await Bid.findOne({ participation_id: participation.id }).sort({created_at:-1});
+      return bid;
+    }else{
+      return null
+    }
+  },
 }
 }

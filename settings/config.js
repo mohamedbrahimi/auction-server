@@ -95,8 +95,8 @@ export default {
       login: { 
         ticket: '',
        },
-      usersmanagement: {
-        ticket: 'usermanagement',
+       systemmanagement: {
+        ticket: 'systemmanagement',
         auth: true
       },
       Keysmanagement: {
@@ -104,11 +104,11 @@ export default {
         auth: true
       },
       articlesmanagement: {
-        ticket: 'articlesmanagemt',
+        ticket: 'articlesmanagement',
         auth: true
       },
       auctionsmanagement: {
-        ticket: 'auctionsmanagemt',
+        ticket: 'auctionsmanagement',
         auth: true
       },
       salesmanagement: {
@@ -123,12 +123,8 @@ export default {
         ticket: 'stockmanagement',
         auth: true
       },
-      accountingmanagement: {
-        ticket: 'accountingmanagement',
-        auth: true
-      },
-      addressmanagement: {
-        ticket: 'addressmanagement',
+      clientsmanagement: {
+        ticket: 'clientsmanagement',
         auth: true
       },
       addressmanagement: {

@@ -11,6 +11,9 @@ const auctionSchema = new mongoose.Schema({
           client_id:{
             type: String,
           },
+          bid_id:{
+            type: String,
+          },
           category_key: {
             type: String,
           },

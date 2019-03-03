@@ -1,7 +1,10 @@
 import Auction   from './auction.model';
 import Article   from '../article/article.model';
 import Categorykey   from '../category-key/category-key.model';
+import Client from '../../mazaduse/client/client.model';
 import Bid from '../../mazaduse/bid/bid.model';
+import Order from '../../mazaduse/order/order.model';
+import Participation from '../../mazaduse/participation/participation.model';
 import __ from 'lodash'
 import jwt from 'jsonwebtoken';
 import config from '../../../settings/config';
@@ -23,6 +26,8 @@ export const AuctionTypeDefs = `
     client_id: String
     model: Article
     bids: [Bid]
+    client: Client
+    bid: Bid
     category_key: String
     category: Categorykey
     priceStart: String
@@ -31,6 +36,7 @@ export const AuctionTypeDefs = `
     startDate: String
     endDate: String
     minNumberParticipants: Int
+    countParticipations: Int
     status: Int
     closed: Int
     created_at: String
@@ -72,11 +78,13 @@ export const AuctionTypeDefs = `
     endDate: String
     status: Int
     minNumberParticipants: Int
+    bid_id: String  
 }
   # Extending the root Mutation type.
   extend type Mutation {
     addAuction(input: AuctionInput!): Auction
     editAuction(id: String!, input: AuctionInput!): Auction
+    confirmOffer(id: String!, input: AuctionInput!): Auction
     deleteAuction(id: String!): Auction
   }
 `;
@@ -112,7 +120,10 @@ export const auctionResolvers = {
     },
 
     auctionsFront: async (_, { filterflied= {}, filterfront= {}, filter = {} }, context) => {
-      filterflied.endDate =  { $gt : new Date() }
+      filterflied.endDate =  { $gt : new Date() };
+      if(filterflied.closed && filterflied.closed == 1){
+        delete filterflied.endDate
+      }
       const auctions = await Auction.find(filterflied);
       const articles = await Article.find(filterfront);
 
@@ -132,6 +143,9 @@ export const auctionResolvers = {
 
     countAuctionsFront: async (_, { filterflied= {}, filterfront= {}}, context) => {
       filterflied.endDate =  { $gt : new Date() }
+      if(filterflied.closed && filterflied.closed == 1){
+        delete filterflied.endDate
+      }
       const auctions = await Auction.find(filterflied);
       const articles = await Article.find(filterfront);
 
@@ -168,8 +182,46 @@ export const auctionResolvers = {
        if(exist && exist._id != id){ //
           throw new Error(errorName.TRYCREATEAUCTION_DUPLICATEARTICLE);
         }
-      const auction  = await Auction.findByIdAndUpdate(id, input);
+      const auction  = await Auction.findByIdAndUpdate(id, Object.assign(input, { closed: 0 }));
       return auction;
+    },
+    confirmOffer: async (_, { id, input }) => {
+    
+      const bid           = await Bid.findById(input.bid_id);
+      if(bid){
+         const participation = await Participation.findById(bid.participation_id);
+         if(participation){
+           const auction       = await Auction.findOneAndUpdate({ _id: id, closed: 0 }, { bid_id: bid._id, client_id: participation.client_id, closed: 1 });
+           if(auction){
+            const article       = await Article.findByIdAndUpdate(auction.model_id, { $inc: { quantity: -1 } });
+            // PUSH AN ORDER 
+ 
+            const inputOrder = { 
+                 type : "AUC",
+                 key_id: participation.key_id,
+                 category_key: auction.category_key,
+                 status: 1,
+                 client_id: participation.client_id,
+                 article_id: auction.model_id,
+                 auction_id: auction._id,
+                 unitprice: article.sellingPrice,
+                 price: bid.price
+             }
+           
+           const order = await Order.create(inputOrder);
+           return auction;
+           }else{
+            throw new Error(errorName.ERRORSYSTEME);
+           }
+          
+         }else {
+          throw new Error(errorName.ERRORSYSTEME);
+         }
+         
+      }else{
+        throw new Error(errorName.ERRORSYSTEME);
+      }
+     
     },
     deleteAuction: async (_, { id }) => {
       const res = await Auction.findByIdAndUpdate(id, { archived: true });
@@ -200,6 +252,28 @@ export const auctionResolvers = {
         }
         return null;
    },
+   bid: async(auction) => {
+    if (auction.bid_id && objectID.isValid(auction.bid_id)) {
+        const  bid = await Bid.findById(auction.bid_id);
+        return bid?bid:null
+      }
+      return null;
+  },
+  countParticipations:async(auction) => {
+    if (auction.id && objectID.isValid(auction.id)) {
+        const  count = await Participation.countDocuments({auction_id: auction.id});
+        return count
+      }else{
+        return 0;
+      }
+  },
+   client: async(auction) => {
+    if (auction.client_id && objectID.isValid(auction.client_id)) {
+        const  client = await Client.findById(auction.client_id);
+        return client?client:null
+      }
+      return null;
+ },
 
 
        }
