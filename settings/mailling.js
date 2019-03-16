@@ -140,6 +140,25 @@ export function sendMail(data, type="confirmation")
                                     <b> L’équipe de gestion des comptes mazadus.</b>` // html body
                         };
                     }break;
+
+                    case "restpassworduser" : {
+                        mailOptions        = {
+                            from: '"Mazadus" <'+config.mailling.username+'>', // sender address
+                            to: `${mail}`, // list of receivers
+                            subject: 'Mot de passe oublié ✔👻😱', // Subject line
+                            html: `<b>Qualqu'un a demandé la réinitialisation du mot de passe pour le compte : ${username}.</b>
+                                
+                                <p> Pour renouveler votre mot de passe cliquer sur le lien suivant : 
+                                    ${link}</p>
+                                <p> Ce lien expirera dans 45 minutes et ne peut être utilisé qu’une seule fois.</p>
+                                    
+                                    <p>
+                                    Si vous ne souhaitez pas modifier votre mot de passe ou n’êtes pas à l’origine de cette demande,
+                                    ignorez ce message et supprimez-le.
+                                    Merci,</p>
+                                    <b> L’équipe de gestion des comptes Mazadus.</b>` // html body
+                        };
+                    }break;
                 }
         
 
@@ -186,6 +205,14 @@ function getToken(data, type){
             },config.token.secret_passwordreset_client, {expiresIn : '1h'});
 
            return `${config.client.site}/login/resetpassword/${token}`;
+       };
+
+       case "restpassworduser": {
+        let token = jwt.sign({
+            username:data.username,
+            },config.token.secret_passwordreset_user, {expiresIn : '45m'});
+            token = `${config.client.admin}/resetpassword/${token}`
+            return token;
        };
 
        default: return ""; break;

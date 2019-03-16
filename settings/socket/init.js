@@ -14,6 +14,11 @@ export const initSocket = async (io, socket) => {
             auction: bid
         });         
       });
+    socket.on('addparticipation', function(participation){
+        io.emit('participation', {
+            auction: participation
+        });         
+      });
      
 }
 

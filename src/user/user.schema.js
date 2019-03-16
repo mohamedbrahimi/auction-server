@@ -16,6 +16,7 @@ export const userTypeDefs = `
  
   type User {
     id: ID!
+    mail: String
     username: String!
     password: String!
     status: Int
@@ -45,6 +46,7 @@ export const userTypeDefs = `
   # input on both the "addUser" and "editUser" methods.
   input UserInput {
     username: String
+    mail: String
     password: String
     role_id: String
     status: Int
@@ -54,6 +56,7 @@ export const userTypeDefs = `
   extend type Mutation {
     addUser(input: UserInput!): User
     editUser(id: String!, input: UserInput!): User
+    editSelf(input: UserInput!): User
     deleteUser(id: String!): User
     login(username: String!, password: String!): String
   }
@@ -127,6 +130,38 @@ export const userResolvers = {
       const user  = await User.create(input);
       return user;
      
+      
+    },
+    editSelf: async (_, { input }, context) => {
+      const token      = context.headers.authorization;
+      const decoded    = jwt.verify(token, config.token.secret);
+      const id = decoded.id;
+      const old        = await User.findById(id);
+      input.username   = input.username.trim().toLowerCase();
+      input.mail       = input.mail.trim().toLowerCase();
+
+      if(old.password != input.password)
+        input.password   = User.hashPassword(input.password);
+      
+      
+      if(old && old.username != input.username)
+      {
+        const exist = await User.findOne({username: input.username});
+        if(exist){
+          throw new Error(errorName.TRYCREATEUSER_DUPLICATEUSERNAME);
+        }
+      } 
+
+      if(old && old.mail != input.mail)
+      {
+        const exist = await User.findOne({mail: input.mail});
+        if(exist){
+          throw new Error(errorName.TRYCREATEUSER_DUPLICATEMAIL);
+        }
+      }
+
+       const user  = await User.findByIdAndUpdate(id, input);
+       return user;
       
     },
     editUser: async (_, { id, input }) => {

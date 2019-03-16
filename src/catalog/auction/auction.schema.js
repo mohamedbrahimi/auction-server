@@ -40,6 +40,7 @@ export const AuctionTypeDefs = `
     status: Int
     closed: Int
     created_at: String
+    updated_at: String
   }
 
   input AuctionFilterInput {

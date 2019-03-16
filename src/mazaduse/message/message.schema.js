@@ -56,6 +56,10 @@ export const MessageTypeDefs = `
     message(id: String!): Message
     countMessages(filterfield:MessageFilterField,): Int
 
+
+    messages_front(filterfield:MessageFilterField, filter: MessageFilterInput): [Message]
+    countMessages_front(filterfield:MessageFilterField,): Int
+
   }
   # We do not need to check if any of the input parameters
   # exist with a "!" character. This is because mongoose will
@@ -115,6 +119,31 @@ export const messageResolvers = {
       const count = await Message.countDocuments(filterfield);
       return count;
     },
+    
+    messages_front: async (_, { filterfield= {}, filter = {} },context) => {
+      try{
+        
+        const token           = context.headers.authorization;
+        const decoded         = jwt.verify(token, config.token.secret_client);
+        filterfield.client_id = decoded.id;
+        const messages = await Message.find(filterfield, null, filter).sort({created_at:-1});
+        
+        return messages;
+      }catch(err){
+        return null
+      }
+     
+    },
+    countMessages_front: async (_, { filterfield= {}}, context) => {
+      const token           = context.headers.authorization;
+      const decoded         = jwt.verify(token, config.token.secret_client);
+      filterfield.client_id = decoded.id;
+
+      const count = await Message.countDocuments(filterfield);
+      return count;
+    },
+
+   
   },
   Mutation: {
     addMessage: async (_, { input }, context) => {

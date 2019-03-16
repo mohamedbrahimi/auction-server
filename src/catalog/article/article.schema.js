@@ -4,6 +4,7 @@ import Category  from '../category/category.model';
 import Gallery   from '../gallery/gallery.model';
 import DataSheet   from '../datasheet/datasheet.model';
 
+import { getSearchText } from '../../../settings/tools';
 import jwt from 'jsonwebtoken';
 import config from '../../../settings/config';
 
@@ -52,6 +53,8 @@ export const ArticleTypeDefs = `
     category_id: String
     brand_id: String
     archived: Boolean
+    text: String
+    manufacturingCountry: String
   }
   # Extending the root Query type.
   extend type Query {
@@ -97,6 +100,7 @@ export const ArticleTypeDefs = `
 export const articleResolvers = {
   Query: {
     articles: async (_, { filterflied= {},filter = {} }, context) => {
+      filterflied = getSearchText(filterflied);
       const articles = await Article.find(filterflied, null, filter);
       // notice that I have ": any[]" after the "Articles" variable?
       // That is because I am using TypeScript but you can remove
@@ -113,6 +117,7 @@ export const articleResolvers = {
       
     },
     countArticles: async (_, { filterflied= {}}, context) => {
+      filterflied = getSearchText(filterflied);
       const count = await Article.countDocuments(filterflied);
       return count
     }

@@ -8,6 +8,7 @@ import Key          from '../../catalog/key/key.model';
 import config from '../../../settings/config';
 import { sendMail } from '../../../settings/mailling';
 import { errorName } from '../../../settings/errors';
+import { searchByCode } from '../../../settings/tools'
 import { tryaddorder, tryTuUpgradeStatusOrder } from '../methods/order.method';
 // import dependencies
 import jwt from 'jsonwebtoken'
@@ -57,7 +58,8 @@ export const OrderTypeDefs = `
     status: Int
     client_id: String
     orders_ids: [String],
-    upgrade: Boolean
+    upgrade: Boolean,
+    text: String
   }
   # Extending the root Query type.
   extend type Query {
@@ -93,9 +95,11 @@ export const OrderTypeDefs = `
   extend type Mutation {
     addOrder(input: OrderInput!): Order
     editOrder(id: String!, input: OrderInput!): Order
+    editOrder_front(id: String!, input: OrderInput!): Order
     printOrders(filterfield: OrderFilterField): [Order]
     upgradeOrders(filterfield: OrderFilterField): [Order]
     deleteOrder(id: String!): Order
+    deleteOrder_front(id: String!): Order
   }
 `;
 
@@ -111,10 +115,10 @@ export const orderResolvers = {
   Query: {
     orders: async (_, { filterfield= {}, filter = {} },context) => {
       try{
-
-        const orders = await Order.find(filterfield, null, filter).sort({created_at:-1});
+          filterfield = await searchByCode(filterfield);
+          const orders = await Order.find(filterfield, null, filter).sort({created_at:-1});
+          return orders;
         
-        return orders;
       }catch(err){
         return null
       }
@@ -137,9 +141,10 @@ export const orderResolvers = {
 
     orders_front: async (_, { filterfield= {}, filter = {} },context) => {
       try{
-        const token       = context.headers.authorization;
-        const decoded     = jwt.verify(token, config.token.secret_client);
-        const orders = await Order.find(Object.assign({client_id: decoded.id, archived: false},filterfield) , null, filter).sort({created_at:-1});
+        const token        = context.headers.authorization;
+        const decoded      = jwt.verify(token, config.token.secret_client);
+        const status_array = [0 ,1 ,2, 3, 4, -501, -601] 
+        const orders = await Order.find(Object.assign({client_id: decoded.id , archived: false},{ status: { $in : status_array } },filterfield) , null, filter).sort({created_at:-1});
         
         return orders;
       }catch(err){
@@ -149,9 +154,10 @@ export const orderResolvers = {
   },
     countOrders_front: async (_, { filterfield= {}}, context) => {
       try {
-        const token       = context.headers.authorization;
-        const decoded     = jwt.verify(token, config.token.secret_client);
-        const count = await Order.countDocuments(Object.assign({client_id: decoded.id, archived: false},filterfield));
+        const token        = context.headers.authorization;
+        const decoded      = jwt.verify(token, config.token.secret_client);
+        const status_array = [0 ,1 ,2, 3, 4, -501, -601] 
+        const count = await Order.countDocuments(Object.assign({client_id: decoded.id, archived: false},{ status: { $in : status_array } },filterfield));
         return count;
       } catch (error) {
         return 0;
@@ -246,6 +252,29 @@ export const orderResolvers = {
     
           return null;
     },
+    editOrder_front: async (_, { id, input }, context) => {
+
+      const token        = context.headers.authorization;
+      const decoded      = jwt.verify(token, config.token.secret_client);
+
+      const order    = await Order.findOne({_id: id ,client_id: decoded.id, status: 0 });
+      if(!order){
+        throw new Error(errorName.ERRORSYSTEME)
+      }
+
+      const article  = await Article.findById(order.article_id);
+
+      if(!article || article.quantity < (input.quantity - order.quantity) + 1){
+        throw new Error(errorName.TRYADDNEWORDER_INSUFFICIENTQUANTITY);
+      }else{
+        const quantity = order.quantity - input.quantity;
+        
+              await Article.findByIdAndUpdate(order.article_id, { $inc: { quantity: quantity } });
+              const odr      = await Order.findByIdAndUpdate(order._id, { quantity: input.quantity });
+              return odr;
+            }
+                      
+},
     printOrders: async(_, { filterfield= {}}, context) => {
          const orderIds = filterfield.orders_ids;
                delete filterfield.orders_ids;
@@ -293,6 +322,22 @@ export const orderResolvers = {
         const res = await Order.findByIdAndUpdate(id, { archived: true});
         return res ? res : null;
     },
+
+    deleteOrder_front: async (_, { id }, context) => {
+      
+      const token        = context.headers.authorization;
+      const decoded      = jwt.verify(token, config.token.secret_client);
+      const order = await Order.findOneAndUpdate({_id: id, status: 0, client_id: decoded.id},{archived: true});
+      
+      if(order){
+        await Article.findByIdAndUpdate(order.article_id, { $inc: { quantity: order.quantity } });
+        await Key.findByIdAndUpdate(order.key_id, { consumed: 0 });
+        return order;
+      }else{
+        return null;
+      }
+      
+  },
 }, 
 Order: {
   client: async (order) => {

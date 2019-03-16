@@ -5,6 +5,7 @@ import Key from '../../catalog/category-key/category-key.model';
 import config from '../../../settings/config';
 import { sendMail } from '../../../settings/mailling';
 import { errorName } from '../../../settings/errors';
+import { getSearchText } from '../../../settings/tools';
 // import dependencies
 import jwt from 'jsonwebtoken'
 
@@ -38,6 +39,8 @@ export const ClientTypeDefs = `
   input ClientFilterField { 
     status : Int
     archived: Boolean
+    confirmed: Int
+    text: String
   }
   # Extending the root Query type.
   extend type Query {
@@ -81,7 +84,7 @@ export const clientResolvers = {
   Query: {
     clients: async (_, { filterfield= {}, filter = {} },context) => {
       try{
-
+        filterfield = getSearchText(filterfield);
         const clients = await Client.find(filterfield, null, filter);
         
         return clients;
@@ -101,6 +104,7 @@ export const clientResolvers = {
       
     },
     countClients: async (_, { filterfield= {}}, context) => {
+      filterfield = getSearchText(filterfield);
       const count = await Client.countDocuments(filterfield);
       return count;
     },
@@ -144,7 +148,7 @@ export const clientResolvers = {
       const old          = await Client.findById(id);
       input.username   = input.username.trim().toLowerCase();
       input.mail       = input.mail.trim().toLowerCase();
-      input.phone      = input.phone.trim().toLowerCase();
+      input.phone      = (input.phone?input.phone:'').trim().toLowerCase();
 
       if(old.password != input.password)
         input.password   = Client.hashPassword(input.password);
@@ -180,7 +184,7 @@ export const clientResolvers = {
         const old         = await Client.findById(id);
         input.username   = input.username.trim().toLowerCase();
         input.mail       = input.mail.trim().toLowerCase();
-        input.phone      = input.phone.trim().toLowerCase();
+        input.phone      = (input.phone?input.phone:'').trim().toLowerCase();
   
         if(old.password != input.password)
           input.password   = Client.hashPassword(input.password);
@@ -221,13 +225,18 @@ export const clientResolvers = {
     },
     loginClient: async (_, { username, password }) => {
       username     = username.toLowerCase().trim();
-      const client    = await Client.findOne({ username:username, status: 1, confirmed: 1,archived: false });
-      const client1   = await Client.findOne({ mail:username, status: 1, confirmed: 1,archived: false });
-      const client2   = await Client.findOne({ phone:username, status: 1, confirmed: 1,archived: false });
+      const client    = await Client.findOne({ username:username, status: 1,archived: false });
+      const client1   = await Client.findOne({ mail:username, status: 1,archived: false });
+      const client2   = await Client.findOne({ phone:username, status: 1,archived: false });
       
       
       if(client || client1 || client2){
         let cl = (client)?client:((client1)?client1:client2);
+        if(cl.confirmed == 0){
+          sendMail(cl)
+          throw new Error(errorName.UNAUTHORIZEDCLIENT);
+          
+        }
 
         const match = await cl.comparePassword(cl, password);
         if (match) {

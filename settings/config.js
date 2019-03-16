@@ -13,15 +13,15 @@ export default {
       port: 4400
     },
     client:{
-      admin:  'http://localhost:4220',
+      admin:  'http://localhost:4220/#',
       site: 'http://localhost:4550' 
     },
     token: {
       secret: 'e-auction-mazaduse',
       secret_client: 'e-auction-mazaduse-client',
       secret_client_confirm: 'e-auction-mazaduse-client-confirm',
-      secret_client_confirm: 'e-auction-mazaduse-client-confirm',
-      secret_passwordreset_client: 'e-auction-mazaduse-passwordreset_adherent'
+      secret_passwordreset_client: 'e-auction-mazaduse-passwordreset_client',
+      secret_passwordreset_user:   'e-auction-mazaduse-passwordreset_user'
     },
     mailling:{
       username: "mazadusecpt@gmail.com",

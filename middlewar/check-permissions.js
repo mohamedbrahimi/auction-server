@@ -58,6 +58,17 @@ module.exports = async(req, res, next) => {
             }
            }; break;
            case "read": {next();}; break;
+           case "write": {
+            try {
+          
+                const token = req.headers.authorization;
+                const decoded = jwt.verify(token, config.token.secret);
+            }catch(err){
+                return res.status(401).json({ 
+                    message: 'Auth failed'
+                });
+            }
+           }
            case null: {next();}; break;
            default: {
             return res.status(401).json({ 

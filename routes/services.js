@@ -3,6 +3,7 @@ import checkauth       from '../middlewar/check-auth';
 import checkauthclient from '../middlewar/check-auth-client';
 import checkclientconfirm from '../middlewar/check-client-confirm';
 import checkresetpassword from '../middlewar/check-restpassword-client';
+import checkresetpassworduser from '../middlewar/check-reset-password-user';
 
 import jwt from 'jsonwebtoken';
 
@@ -43,7 +44,7 @@ router.get('/confirm-account',checkclientconfirm, async function(req, res) {
 });
 
 // reste password 
-/*router.get('/check-passwordrest-user', checkresetpassworduser, async function(req, res) {
+router.get('/check-passwordrest-user', checkresetpassworduser, async function(req, res) {
 
    const token = req.headers.authorization;
    const decoded = jwt.verify(token, config.token.secret_passwordreset_user);
@@ -57,7 +58,7 @@ router.get('/confirm-account',checkclientconfirm, async function(req, res) {
      });
    }
    
-});*/
+});
 router.get('/check-passwordrest-client', checkresetpassword, async function(req, res) {
 
    const token = req.headers.authorization;
@@ -75,7 +76,7 @@ router.get('/check-passwordrest-client', checkresetpassword, async function(req,
 });
 // try reset password
 
-/*router.post('/try-passwordrest-user', async function(req, res) {
+router.post('/try-passwordrest-user', async function(req, res) {
 
   
    let mail = req.body.mail;
@@ -93,7 +94,7 @@ router.get('/check-passwordrest-client', checkresetpassword, async function(req,
      });
    }
    
-});*/
+});
 router.post('/try-passwordrest-client', async function(req, res) {
 
   
@@ -119,7 +120,7 @@ router.post('/try-passwordrest-client', async function(req, res) {
 });
 
 // reste password last step
-/*router.post('/passwordrest-user', checkresetpassworduser, async function(req, res) {
+router.post('/passwordrest-user', checkresetpassworduser, async function(req, res) {
    const token = req.headers.authorization;
    const decoded = jwt.verify(token, config.token.secret_passwordreset_user);
 
@@ -141,7 +142,7 @@ router.post('/try-passwordrest-client', async function(req, res) {
      });
    }
    
-});*/
+});
 router.post('/passwordrest-client', checkresetpassword, async function(req, res) {
    const token = req.headers.authorization;
    const decoded = jwt.verify(token, config.token.secret_passwordreset_client);

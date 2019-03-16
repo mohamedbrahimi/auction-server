@@ -147,6 +147,39 @@ export function removeParticularImage(field, path, id_obj){
       }
 })
 }
+
+export function getSearchText(filterfield){
+    if(filterfield.text && filterfield.text.trim() != ""){
+      const text  = filterfield.text;
+      const query = { $text: { $search : text } };
+      delete filterfield.text;
+      filterfield = Object.assign( query ,filterfield);
+      return filterfield;
+    }else{
+      return filterfield;
+    }
+  }
+export function searchByCode(filterfield){
+    return new Promise( async resolve => {
+        console.log(filterfield)
+        if(filterfield.text && filterfield.text.trim() != ""){
+            const text  = filterfield.text;
+            const query = { $text: { $search : text } };
+            const keys  = await Key.find(query);
+            var key_ids = [];
+            for(let key of keys){
+                key_ids.push(key._id);
+            }
+            const qr = { key_id : { $in : key_ids}}
+            delete filterfield.text;
+            filterfield = Object.assign( qr ,filterfield);
+            resolve(filterfield);
+          }else{
+            resolve(filterfield);
+          }
+    })
+    
+}
  
 
 

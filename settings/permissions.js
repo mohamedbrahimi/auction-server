@@ -9,6 +9,11 @@ const def_role_read = {
         type: "read"
     },
 }
+const def_role_write = {
+    auth: {
+        type: "write"
+    },
+}
  const def_role_client = {
     auth: {
         type: "client"
@@ -144,7 +149,7 @@ export default {
     orders: def_role_order,
     order: def_role_order,
     countOrders: def_role_read,
-    addOrder: def_role_order,
+    addOrder: def_role_client,
     editOrder: def_role_order,
     printOrders: def_role_order,
     upgradeOrders: def_role_order,
@@ -152,6 +157,8 @@ export default {
 
     orders_front: def_role_client,
     countOrders_front: def_role_client,
+    editOrder_front: def_role_client,
+    deleteOrder_front: def_role_client,
 
 
     messages: def_role_message,
@@ -160,6 +167,10 @@ export default {
     addMessage: def_role_client,
     editMessage: def_role_message,
     deleteMessage: def_role_message,
+
+    messages_front: def_role_client,
+    countMessages_front: def_role_client,
+   
 
     clients: def_role_client_admin,
     client: def_role_client_admin,
@@ -179,6 +190,7 @@ export default {
     users: def_role_system,
     user: def_role_system,
     addUser:     def_role_system,
+    editSelf:    def_role_write,
     editUser:    def_role_system,
     countusers:  def_role_system,
     deleteUser:  def_role_system,
