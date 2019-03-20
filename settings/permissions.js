@@ -37,6 +37,12 @@ const def_role_auction = {
     },
     permission: config.permissions.auctionsmanagement.ticket
 }
+const def_role_slider = {
+    auth: {
+        type: "admin"
+    },
+    permission: config.permissions.slidersmanagement.ticket
+}
 const def_role_key = {
     auth: {
         type: "admin"
@@ -87,6 +93,13 @@ export default {
     addArticle: def_role_article,
     editArticle: def_role_article,
     deleteArticle: def_role_article,
+
+    sliders: def_role_read,
+    slider: def_role_read,
+    countSliders: def_role_read,
+    addSlider: def_role_slider,
+    editSlider: def_role_slider,
+    deleteSlider: def_role_slider,
 
     categories: def_role_read,
     category: def_role_read,
@@ -145,6 +158,9 @@ export default {
     addParticipation: def_role_client,
     editParticipation: def_role_system,
     deleteParticipation: def_role_system,
+
+    participations_front: def_role_client,
+    countParticipations_front: def_role_client,
 
     orders: def_role_order,
     order: def_role_order,

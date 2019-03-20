@@ -16,6 +16,7 @@ import schema     from  './schema/schema';
 import config from './settings/config'
 import { errorType } from './settings/errors'
 import { initSocket } from './settings/socket/init';
+import { init } from './settings/init';
 // permisson
 import checkpermission from  './middlewar/check-permissions'
 
@@ -73,7 +74,7 @@ app.use('/graphql',checkpermission, express_graphql({
             return ({ message: error.message, statusCode: error.statusCode})
         }else{
             console.log(err)
-            return ({ message: "unknown error", statusCode: 501})
+            return ({ message: "unknown error", statusCode: 301})
         }
 	   
 	   }
@@ -98,27 +99,6 @@ io.on('connection', (socket) => {
   
 http.listen(config.server.port, () => {
 	console.log('Server Now Running On Port '+config.server.port+'!');
-
-    let prepare_dir = config.styleImage;
-    let root_path   = `./public/assets/image`;
-
-    for(let item of prepare_dir){
-        let super_dir = item.path;
-        if (!fs.existsSync(`${root_path}/${super_dir}`)){
-            fs.mkdirSync(`${root_path}/${super_dir}`);
-        }
-        for(let itm of item.data_path){
-            let second_dir = itm.path;
-            if (!fs.existsSync(`${root_path}/${super_dir}/${second_dir}`)){
-                fs.mkdirSync(`${root_path}/${super_dir}/${second_dir}`);
-            }
-            for(let im of itm.data_path){
-                let third_dir = `${root_path}/${super_dir}/${second_dir}/${im.path}`;
-                if (!fs.existsSync(third_dir)){
-                    fs.mkdirSync(third_dir);
-                }
-            }
-        }
-    }
+    init();
     
 })

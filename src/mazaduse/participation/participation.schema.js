@@ -53,6 +53,9 @@ export const ParticipationTypeDefs = `
     participation(id: String!): Participation
     countParticipations(filterfield:ParticipationFilterField,): Int
 
+    participations_front(filterfield:ParticipationFilterField, filter: ParticipationFilterInput): [Participation]
+    countParticipations_front(filterfield:ParticipationFilterField,): Int
+
   }
   # We do not need to check if any of the input parameters
   # exist with a "!" character. This is because mongoose will
@@ -105,6 +108,28 @@ export const participationResolvers = {
     },
     countParticipations: async (_, { filterfield= {}}, context) => {
       const count = await Participation.countDocuments(filterfield);
+      return count;
+    },
+
+    participations_front: async (_, { filterfield= {}, filter = {} },context) => {
+      try{
+
+        const token       = context.headers.authorization;
+        const decoded     = jwt.verify(token, config.token.secret_client);
+
+        const participations = await Participation.find(Object.assign(filterfield, { client_id: decoded.id }), null, filter).sort({created_at:-1});
+
+        return participations;
+      }catch(err){
+        return null
+      }
+
+    },
+    countParticipations_front: async (_, { filterfield= {}}, context) => {
+      const token       = context.headers.authorization;
+      const decoded     = jwt.verify(token, config.token.secret_client);
+
+      const count = await Participation.countDocuments(Object.assign(filterfield, { client_id: decoded.id }));
       return count;
     },
   },
@@ -165,6 +190,14 @@ Participation: {
     if(participation && participation.client_id){
       const client = await Client.findById(participation.client_id);
       return client;
+    }else{
+      return null
+    }
+  },
+  auction: async (participation) => {
+    if(participation && participation.auction_id){
+      const auction = await Auction.findById(participation.auction_id);
+      return auction;
     }else{
       return null
     }

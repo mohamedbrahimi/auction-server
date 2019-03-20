@@ -61,7 +61,7 @@ export let tryaddParticipation = async (client_id, category_id, auction_id) => {
 }
 
 
-export const tryTuUpgradeStatusOrder = async (status) => {
+export const tryToUpgradeStatusOrder = async (status) => {
    return new Promise(resolve => {
      switch(status){
        case 0 :  resolve(1);break;

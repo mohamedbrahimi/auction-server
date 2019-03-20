@@ -9,7 +9,7 @@ import config from '../../../settings/config';
 import { sendMail } from '../../../settings/mailling';
 import { errorName } from '../../../settings/errors';
 import { searchByCode } from '../../../settings/tools'
-import { tryaddorder, tryTuUpgradeStatusOrder } from '../methods/order.method';
+import { tryaddorder, tryToUpgradeStatusOrder } from '../methods/order.method';
 // import dependencies
 import jwt from 'jsonwebtoken'
 
@@ -213,33 +213,46 @@ export const orderResolvers = {
             throw new Error(errorName.TRYADDNEWORDER_INSUFFICIENTQUANTITY);
           }else{
                 switch(input.status){
-                    case -1   : {
-                      if (order.status != -1 && order.status != 3){
+                    case -1   : { // 0 | 1 | 2 | 
+                      if ( [0, 1, 2].includes(order.status)){ 
                           await Article.findByIdAndUpdate(order.article_id, { $inc: { quantity: order.quantity } });
                         if(order.status == 0){
                           await Key.findByIdAndUpdate(order.key_id, { consumed: 0 });
                         }
                         const odr = await Order.findByIdAndUpdate(order._id, { status: -1 });
+                        // IF ORDER HAS TYPE OF AUCTION
+                        if(odr.type = "AUC"){
+                          const auction = await Auction.findByIdAndUpdate(odr.auction_id, {closed: 0}); 
+                        }
                         return odr;
                       }else if( order.status == 3){
                         const odr = await Order.findByIdAndUpdate(order._id, { status: -501 });
                         return odr;
+                      }else{
+                        
+                        return [];
                       }
                     } break;
                     case -701 : {
-                      if (order.status != -701){
+                      if (order.status == -601){
                           await Article.findByIdAndUpdate(order.article_id, { $inc: { quantity: order.quantity } });
                           const odr = await Order.findByIdAndUpdate(order._id, { status: -701 });
+                          if(odr.type = "AUC"){
+                            const auction = await Auction.findByIdAndUpdate(odr.auction_id, {closed: 0}); 
+                          }
+                          
                           return odr;
+                      }else{
+                        return [];
                       }
                     } break;
                     default   : {
-                      const status_arr = await tryTuUpgradeStatusOrder(order.status);
-                      if(status_arr && input.status != 90){
+                      const status_arr = await tryToUpgradeStatusOrder(order.status);
+                      if(status_arr){
                         const odr      = await Order.findByIdAndUpdate(order._id, { status: status_arr, quantity: input.quantity });
                         await Article.findByIdAndUpdate(order.article_id, { $inc: { quantity: quantity } });
                         return odr;
-                      }
+                      } // edit order
                         else{
                           await Article.findByIdAndUpdate(order.article_id, { $inc: { quantity: quantity } });
                           const odr      = await Order.findByIdAndUpdate(order._id, { quantity: input.quantity });
@@ -294,14 +307,18 @@ export const orderResolvers = {
       
       const orderIds = filterfield.orders_ids;
             delete filterfield.orders_ids;
-      const status  = await tryTuUpgradeStatusOrder(filterfield.status);
+      const status  = await tryToUpgradeStatusOrder(filterfield.status);
       if(status){
         await Order.updateMany(Object.assign({ _id: { $in : orderIds } }, filterfield),     { $set: { status : status } });
         filterfield.status = status;
         const orders = await Order.find(Object.assign({ _id: { $in : orderIds } }, filterfield))
       if(status == -701 && orders){
         for(let item of orders){
-          let article = await Article.findByIdAndUpdate(item.article_id, { $inc: { quantity: item.quantity } })
+          let article = await Article.findByIdAndUpdate(item.article_id, { $inc: { quantity: item.quantity } });
+          if(item.type = "AUC"){
+            let auction = await Auction.findByIdAndUpdate(item.auction_id, {closed: 0});
+          }
+
         }
         return orders;
       }else{

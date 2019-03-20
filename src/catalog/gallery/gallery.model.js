@@ -37,16 +37,16 @@ const gallerySchema = new mongoose.Schema({
 gallerySchema.set('toObject', { virtuals: true });
 
 
-gallerySchema.pre('save', function(next) {
+gallerySchema.pre('save', async function(next) {
   let currentDate = Date.now();
   let imageName   = `${this._id}_${currentDate}`;
-  generateStyleImage(this.path, 'article', imageName, 'slide');
+  await generateStyleImage(this.path, 'article', imageName, 'slide');
   this.path = `/assets/image/article/slide/original/${imageName}.png`;
   next();
   
 });
 
-gallerySchema.pre('findOneAndUpdate', function(next) {
+gallerySchema.pre('findOneAndUpdate', async function(next) {
   // Yes, this works, findOneAndUpdate is called with
   // 'runValidators: true' and 'context: 'query''
   let doc_id  = this.getQuery();

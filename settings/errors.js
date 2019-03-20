@@ -21,6 +21,7 @@ exports.errorName = {
    TRYADDPARTICIPATION_EXISTSONE: 'TRYADDPARTICIPATION_EXISTSONE',
 
    TRYADD_ACTIONOFAUCTION: 'TRYADD_ACTIONOFAUCTION',
+   TRYADD_BID_OVERTAKING: 'TRYADD_BID_OVERTAKING',
 
 
    ERRORSYSTEME: 'ERRORSYSTEM'
@@ -106,6 +107,10 @@ exports.errorType = {
     TRYADD_ACTIONOFAUCTION: {
         message: 'Can\'t add new action',
         statusCode: 405,  
+    },
+    TRYADD_BID_OVERTAKING:{
+        message: 'Can\'t add new action, overtaking!',
+        statusCode: 406,  
     }
     
  }

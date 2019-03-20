@@ -8,7 +8,7 @@ import checkresetpassworduser from '../middlewar/check-reset-password-user';
 import jwt from 'jsonwebtoken';
 
 import config from '../settings/config';
-import { sendMail } from '../settings/mailling';
+import { sendMail, sendMailContact } from '../settings/mailling';
 import User from '../src/user/user.model';
 import Client from '../src/mazaduse/client/client.model';
 const router = express.Router();
@@ -164,6 +164,15 @@ router.post('/passwordrest-client', checkresetpassword, async function(req, res)
          message: 'failed operation'
      });
    }
+   
+});
+
+router.post('/contact', async function(req, res) {
+ 
+   const body = req.body;
+   sendMailContact(body);
+
+   return res.status(200).json({'success': ' Your mail has been sended!'})
    
 });
 export default router; 

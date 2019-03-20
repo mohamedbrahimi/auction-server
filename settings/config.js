@@ -25,7 +25,11 @@ export default {
     },
     mailling:{
       username: "mazadusecpt@gmail.com",
-      password: "mazaduse2209"
+      password: "mazaduse2209",
+
+      contact: {
+         mail: "contactmazaduse@gmail.com"
+      }
     },
     debug: {
        mode: "dev",
@@ -89,6 +93,39 @@ export default {
           
         ]
         
+      },
+      {
+        path: "slider",
+        data_path: [
+          {
+            path: "logo",
+            data_path: [
+              {
+                size: [50,50],
+                path: "50x50"
+              },
+              {
+                size: [172,172],
+                path: "172x172"
+              }
+            ],
+          },
+          {
+            path: "slide",
+            data_path: [
+              {
+                size: [250, 250],
+                path: "250x250"
+              },
+              {
+                size: [484, 441],
+                path: "484x441"
+              }
+            ],
+          }
+          
+        ]
+        
       }
     ],
     permissions: {
@@ -145,6 +182,10 @@ export default {
       },
       alertsmanagement: {
         ticket: 'alertsmanagement',
+        auth: true
+      },
+      slidersmanagement: {
+        ticket: 'slidersmanagement',
         auth: true
       },
     }

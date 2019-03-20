@@ -38,6 +38,7 @@ export const AuctionTypeDefs = `
     minNumberParticipants: Int
     countParticipations: Int
     status: Int
+    archived: Boolean
     closed: Int
     created_at: String
     updated_at: String

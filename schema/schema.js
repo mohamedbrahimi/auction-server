@@ -13,6 +13,8 @@ import { dataSheetResolvers, DataSheetTypeDefs } from '../src/catalog/datasheet/
 import { categorykeyResolvers, CategorykeyTypeDefs } from '../src/catalog/category-key/category-key.schema';
 import { keyResolvers, KeyTypeDefs } from '../src/catalog/key/key.schema';
 import { auctionResolvers, AuctionTypeDefs } from '../src/catalog/auction/auction.schema';
+
+import { sliderResolvers, SliderTypeDefs } from '../src/catalog/slider/slider.schema';
 // mazaduse
 import { clientResolvers, ClientTypeDefs } from '../src/mazaduse/client/client.schema';
 import { profileResolvers, ProfileTypeDefs } from '../src/mazaduse/client/profile.schema';
@@ -38,7 +40,7 @@ export default makeExecutableSchema ({
                DataSheetTypeDefs, CategorykeyTypeDefs, KeyTypeDefs,
                ClientTypeDefs, AuctionTypeDefs, MessageTypeDefs,
                OrderTypeDefs, ParticipationTypeDefs, BidTypeDefs,
-               ProfileTypeDefs
+               ProfileTypeDefs, SliderTypeDefs
               ],
 
     resolvers: _.merge(
@@ -47,7 +49,7 @@ export default makeExecutableSchema ({
                        dataSheetResolvers, categorykeyResolvers, keyResolvers,
                        clientResolvers, auctionResolvers, messageResolvers,
                        orderResolvers, participationResolvers, bidResolvers,
-                       profileResolvers
+                       profileResolvers, sliderResolvers,
 
                       )
 })

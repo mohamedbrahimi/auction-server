@@ -1,4 +1,5 @@
 import Article     from '../src/catalog/article/article.model';
+import Slider      from '../src/catalog/slider/slider.model';
 import Gallery     from '../src/catalog/gallery/gallery.model';
 import Message     from '../src/mazaduse/message/message.model';
 import Categorykey from '../src/catalog/category-key/category-key.model';
@@ -11,43 +12,46 @@ import config    from './config';
 
 
 export function generateStyleImage(base64,root_path,imageName, path = 'logo') {
-    base64Img.img(base64, `./public/assets/image/${root_path}/${path}/original`, imageName , function(err, filepath) {
-        if(!err)
-        { 
-
-            let array_style_path = config.styleImage;
-            for(let item of array_style_path){
-              if(item.path == root_path){
-                
-                for(let im of item.data_path){
-                    if(im.path == path){
-                        
-                        for(let itm of im.data_path){
-                            sharp(filepath)
-                            .resize(itm.size[0], itm.size[1])
-                            .flatten({
-                                background: 'white'
-                                })
-                            .toFile(`public/assets/image/${root_path}/${path}/${itm.path}/${imageName + '.png'}`);
+    return new Promise(resolve => {
+        base64Img.img(base64, `./public/assets/image/${root_path}/${path}/original`, imageName , function(err, filepath) {
+            if(!err)
+            { 
+    
+                let array_style_path = config.styleImage;
+                for(let item of array_style_path){
+                  if(item.path == root_path){
+                    
+                    for(let im of item.data_path){
+                        if(im.path == path){
+                            
+                            for(let itm of im.data_path){
+                                sharp(filepath)
+                                .resize(itm.size[0], itm.size[1])
+                                .flatten({
+                                    background: 'white'
+                                    })
+                                .toFile(`public/assets/image/${root_path}/${path}/${itm.path}/${imageName + '.png'}`);
+                            }
+    
+                            resolve(1);
                         }
-
-                        return false;
                     }
+                    resolve(0);
+                  }
                 }
-                return false;
-              }
-            }
-            
-        }}) 
+                
+            }}) 
+    })
+
   }
 
   export function removeOldImage(id_obj, path_root, path){
    
-    getModel(path).findById(id_obj)  
+    getModel(path_root, path).findById(id_obj)  
       .exec()
       .then((article) => {
 
-        let file_path   = article[getModelFieldImageName(path)]; 
+        let file_path   = article[getModelFieldImageName(path_root ,path)]; 
         let original    = `public${file_path}`;
         try{
             if(fs.existsSync(original))fs.unlinkSync(original);
@@ -118,23 +122,43 @@ export function constructFullNumber(length, data)
 }
 
 
-function getModel(path){
-    switch(path){
-        case "slide": return Gallery; break;
-        case "logo" : return Article; break;
-        case "attached_file": return Message; break;
+function getModel(path_root, path){
+    switch(path_root){
+        case "article": {
+            switch(path){
+                case "slide": return Gallery; break;
+                case "logo" : return Article; break;
+            }
+        } break;
+       
+        case "messages": return Message; break;
+        case "slider": return Slider; break;
     }
 }
 
-function getModelFieldImageName(path){
-    switch(path){
-        case "slide": return 'path'; break;
-        case "logo" : return 'image'; break;
+function getModelFieldImageName(path_root ,path){
+    
+    switch(path_root){
+       case "article" : {
+            switch(path){
+                case "slide": return 'path'; break;
+                case "logo" : return 'image'; break;
+            }
+       } break;
+
+       case "slider" : {
+        switch(path){
+            case "slide": return 'slide'; break;
+            case "logo" : return 'logo'; break;
+        }
+       }
     }
+    
+   
 }
 
 export function removeParticularImage(field, path, id_obj){
-    getModel(path).findById(id_obj)  
+    getModel('messages', path).findById(id_obj)  
     .exec()
     .then((article) => {
 

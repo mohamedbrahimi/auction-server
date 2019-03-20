@@ -74,16 +74,16 @@ articleSchema.set('toObject', { virtuals: true });
 
 
 
-articleSchema.pre('save', function(next) {
+articleSchema.pre('save', async function(next) {
   let currentDate = Date.now();
   let imageName   = `${this._id}_${currentDate}`;
-  generateStyleImage(this.image, 'article', imageName);
+  await generateStyleImage(this.image, 'article', imageName);
   this.image = `/assets/image/article/logo/original/${imageName}.png`;
    next();
 
 });
 
-articleSchema.pre('findOneAndUpdate', function(next) {
+articleSchema.pre('findOneAndUpdate', async function(next) {
   // Yes, this works, findOneAndUpdate is called with
   // 'runValidators: true' and 'context: 'query''
   let doc_id  = this.getQuery();
@@ -98,7 +98,7 @@ articleSchema.pre('findOneAndUpdate', function(next) {
     let imageName   = `${doc_id._id}_${currentDate}`;
     
     removeOldImage(doc_id._id, 'article','logo');
-    generateStyleImage(doc.image, 'article', imageName);
+    await generateStyleImage(doc.image, 'article', imageName);
     this.getUpdate().image = `/assets/image/article/logo/original/${imageName}.png`;
     next();
   }

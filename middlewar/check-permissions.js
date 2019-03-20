@@ -12,7 +12,7 @@ module.exports = async(req, res, next) => {
         const required = permissions[ticket];
        // console.log(required)
        // console.log(req.body.query.split('{')[1].split('}')[0].split('(')[0].trim())
-        
+       
         switch(required.auth.type){
            case "client": {
             try {
