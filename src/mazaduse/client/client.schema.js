@@ -240,7 +240,7 @@ export const clientResolvers = {
 
         const match = await cl.comparePassword(cl, password);
         if (match) {
-          return jwt.sign({ id: cl._id }, config.token.secret_client, {expiresIn: '12h'});
+          return jwt.sign({ id: cl._id }, config.token.secret_client, {expiresIn: '30d'});
         }else {throw new Error(errorName.UNAUTHORIZEDPASSWORD);}
       }else{
         throw new Error(errorName.UNAUTHORIZEDUSERNAME);
