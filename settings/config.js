@@ -14,7 +14,8 @@ export default {
     },
     client:{
       admin:  'http://localhost:4220/#',
-      site: 'http://localhost:4550' 
+      site: 'http://localhost:4550',
+      timer: 20000
     },
     token: {
       secret: 'e-auction-mazaduse',
