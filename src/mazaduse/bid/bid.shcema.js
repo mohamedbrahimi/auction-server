@@ -111,10 +111,11 @@ export const bidResolvers = {
         const participation = await tryAddBid(decoded.id, input.auction_id);
          
         if(participation){
-            let auction      = await Auction.findById(input.auction_id);
-            const article    = await Article.findById(auction.model_id);
+            let auction      = await Auction.findOne({_id: input.auction_id, endDate : { $gt : new Date() }});
+            
             if(auction){
-                
+              
+                const article    = await Article.findById(auction.model_id);
                 let currentPrice = (!auction.currentPrice ||  isNaN(auction.currentPrice))?0:parseFloat(auction.currentPrice);
                 let priceStart   = (!auction.priceStart ||  isNaN(auction.priceStart))?0:parseFloat(auction.priceStart);
                     currentPrice = ( currentPrice == 0 )?priceStart:currentPrice;

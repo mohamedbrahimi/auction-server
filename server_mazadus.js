@@ -67,7 +67,7 @@ connection.once('open', () => {
 app.use('/graphql',checkpermission, express_graphql({
    schema: schema,
    withCredentials: true,
-   graphiql: true,
+  // graphiql: true,
    formatError: (err) => {
 	   let error = getErrorCode(err.message);
 	    if(error){

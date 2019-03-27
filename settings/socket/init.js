@@ -31,6 +31,7 @@ export const initSocket = async (io, socket) => {
         });         
       });
   
+    
     socket.on('updateauction', function(auction){
         io.emit('updateauction', {
             auction: auction
@@ -42,6 +43,7 @@ export const initSocket = async (io, socket) => {
             article: article
         });         
       });
+    
      
 }
 

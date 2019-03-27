@@ -90,7 +90,7 @@ function notify_participants_init(){
             }
          }
   
-    },6 * 60 * 60000)
+    },24 * 60 * 60000)
 }
 
 

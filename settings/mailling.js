@@ -162,7 +162,7 @@ export function sendMail(data, type="confirmation", options = [])
                             subject: 'Participation à l\'enchère ✔ ⏳', // Subject line
                             html: `<b> Salut : ${username}.</b>
                                 
-                                <p> Nous avons le plaisir de vous rappelle que vous avez participé à l'enchère : 
+                                <p> Nous avons le plaisir de vous rappeller que vous avez participé à l'enchère : 
                                     ${options.article.label }</p>
                                 <p> Et pour ce la vous êtes invité à l'enchère sur le site 
                                   <a href="${config.client.site}/product-detail/${options.auction._id}"> www.Mazadus.com </a> 
