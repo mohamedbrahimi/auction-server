@@ -22,6 +22,8 @@ exports.errorName = {
 
    TRYADD_ACTIONOFAUCTION: 'TRYADD_ACTIONOFAUCTION',
    TRYADD_BID_OVERTAKING: 'TRYADD_BID_OVERTAKING',
+   TRYADD_BID_INSUFFICIENT_NUMBER_OF_PARTICIPANTS: 'TRYADD_BID_INSUFFICIENT_NUMBER_OF_PARTICIPANTS',
+
 
 
    ERRORSYSTEME: 'ERRORSYSTEM'
@@ -111,6 +113,10 @@ exports.errorType = {
     TRYADD_BID_OVERTAKING:{
         message: 'Can\'t add new action, overtaking!',
         statusCode: 406,  
+    },
+    TRYADD_BID_INSUFFICIENT_NUMBER_OF_PARTICIPANTS:{
+        message: 'Can\'t add new action, INSUFFICIENT NUMBER OF PARTICIPANTS!',
+        statusCode: 407, 
     }
     
  }

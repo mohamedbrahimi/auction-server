@@ -4,6 +4,7 @@ import Article       from '../../catalog/article/article.model';
 import Auction       from '../../catalog/auction/auction.model';
 import Categorykey   from '../../catalog/category-key/category-key.model'
 import Key          from '../../catalog/key/key.model';
+import Message          from '../message/message.model';
 // import config
 import config from '../../../settings/config';
 import { sendMail } from '../../../settings/mailling';
@@ -42,6 +43,7 @@ export const OrderTypeDefs = `
     article: Article
     auction: Auction
     category: Categorykey
+    stub: Message
 
     # Last name is not a required field so it 
     # does not need a "!" at the end.
@@ -283,7 +285,7 @@ export const orderResolvers = {
         const quantity = order.quantity - input.quantity;
         
               await Article.findByIdAndUpdate(order.article_id, { $inc: { quantity: quantity } });
-              const odr      = await Order.findByIdAndUpdate(order._id, { quantity: input.quantity });
+              const odr      = await Order.findByIdAndUpdate(order._id, { quantity: input.quantity, price: input.quantity * parseFloat(order.unitprice)});
               return odr;
             }
                       
@@ -388,6 +390,15 @@ Order: {
     if(order && order.key_id){
       const key = await Key.findById(order.key_id);
       return key;
+    }else{
+      return null
+    }
+  },
+  stub: async(order) => {
+
+    if(order && order.id && order.client_id){
+      const message = await Message.findOne({ type: "ORDER", client_id: order.client_id, order_id: order.id });
+      return message;
     }else{
       return null
     }

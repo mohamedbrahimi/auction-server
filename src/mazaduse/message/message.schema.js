@@ -74,12 +74,14 @@ export const MessageTypeDefs = `
     category_key: String
     note: String
     status: Int
+    order_id: String
     op: String
   }
   # Extending the root Mutation type.
   extend type Mutation {
     addMessage(input: MessageInput!): Message
     editMessage(id: String!, input: MessageInput!): Message
+    editFrontMessage(id: String!, input: MessageInput!): Message
     deleteMessage(id: String!): Message
   }
 `;
@@ -97,7 +99,7 @@ export const messageResolvers = {
     messages: async (_, { filterfield= {}, filter = {} },context) => {
       try{
 
-        const messages = await Message.find(filterfield, null, filter).sort({created_at:-1});
+        const messages = await Message.find(Object.assign(filterfield, { type: "KEY" }), null, filter).sort({created_at:-1});
         
         return messages;
       }catch(err){
@@ -116,7 +118,7 @@ export const messageResolvers = {
       
     },
     countMessages: async (_, { filterfield= {}}, context) => {
-      const count = await Message.countDocuments(filterfield);
+      const count = await Message.countDocuments(Object.assign(filterfield, { type: "KEY" }));
       return count;
     },
     
@@ -126,7 +128,7 @@ export const messageResolvers = {
         const token           = context.headers.authorization;
         const decoded         = jwt.verify(token, config.token.secret_client);
         filterfield.client_id = decoded.id;
-        const messages = await Message.find(filterfield, null, filter).sort({created_at:-1});
+        const messages = await Message.find(Object.assign(filterfield, { type: "KEY" }), null, filter).sort({created_at:-1});
         
         return messages;
       }catch(err){
@@ -139,7 +141,7 @@ export const messageResolvers = {
       const decoded         = jwt.verify(token, config.token.secret_client);
       filterfield.client_id = decoded.id;
 
-      const count = await Message.countDocuments(filterfield);
+      const count = await Message.countDocuments(Object.assign(filterfield, { type: "KEY" }));
       return count;
     },
 
@@ -152,22 +154,29 @@ export const messageResolvers = {
       const decoded    = jwt.verify(token, config.token.secret_client);
       const client     = await Client.findById(decoded.id);
       input.client_id  = (client)?client._id:'';
-      const message  = await Message.create(input);
-      if(client)
-      sendMail(client,"demandecredit");
+      const message    = await Message.create(input);
+      if(client){
+        switch(input.type){
+          case "KEY"   : sendMail(client,"demandecredit"); break;
+          case "ORDER" : /*sendMail(client,"demandecredit");*/ break;
+        }
+        
+      }
+      
       return message;
      
       
     },
     editMessage: async (_, { id, input }, context) => {
 
+      const token      = context.headers.authorization;
+      const decoded    = jwt.verify(token, config.token.secret); 
           let op = input.op;
                    delete input.op;
+
           switch(op){
              case "101" : // CANCEL
              {
-              const token      = context.headers.authorization;
-              const decoded    = jwt.verify(token, config.token.secret);
               
               const message  = await Message.findByIdAndUpdate(id, { treated:1, note: input.note, treated_by:decoded.id, last_update: new Date(), status: 0 });
               // SEND MAIL WITH NOTE TEXT
@@ -183,8 +192,7 @@ export const messageResolvers = {
               for(let i= 0; i< msg.keynumber; i++){
                  let key = await Key.create({ client_id: msg.client_id, category_key: msg.category_key });
               }
-              const token      = context.headers.authorization;
-              const decoded    = jwt.verify(token, config.token.secret);
+              
 
               const message  = await Message.findByIdAndUpdate(id, { treated:1, treated_by:decoded.id, last_update: new Date() });
               // SEND MAIL
@@ -193,6 +201,7 @@ export const messageResolvers = {
               return message;
              }
              break; 
+
           } 
           
     },
@@ -201,6 +210,16 @@ export const messageResolvers = {
         const res = await Message.findByIdAndUpdate(id, { archived: true});
         return res ? res : null;
     },
+
+    editFrontMessage: async (_, { id, input }, context) => {
+
+      const token      = context.headers.authorization;
+      const decoded    = jwt.verify(token, config.token.secret_client); 
+      const message = await Message.findOneAndUpdate({ _id:id },{ last_update: new Date(), attached_file:input.attached_file });
+      return message;
+    } 
+          
+    
 }, 
 Message: {
   client: async (message) => {

@@ -43,6 +43,10 @@ export function sendMail(data, type="confirmation", options = [])
                             ${link}
                             <br>
                             <b>Ce lien expirera dans 60 minutes et ne peut être utilisé qu’une seule fois.</b>
+                            <br>
+                            <a href="${link}">
+                            Si le lien n'apparaître pas bien, Veuillez cliquer ici.
+                            </a>
                             
                             
                             <p>Merci,</p>
@@ -127,7 +131,10 @@ export function sendMail(data, type="confirmation", options = [])
                                 <p> Pour renouveler votre mot de passe cliquer sur le lien suivant : 
                                     ${link}</p>
                                 <p> Ce lien expirera dans 45 minutes et ne peut être utilisé qu’une seule fois.</p>
-                                    
+                                <br>
+                                <a href="${link}">
+                                Si le lien n'apparaître pas bien, Veuillez cliquer ici.
+
                                     <p>
                                     Si vous ne souhaitez pas modifier votre mot de passe ou n’êtes pas à l’origine de cette demande,
                                     ignorez ce message et supprimez-le.
@@ -146,7 +153,9 @@ export function sendMail(data, type="confirmation", options = [])
                                 <p> Pour renouveler votre mot de passe cliquer sur le lien suivant : 
                                     ${link}</p>
                                 <p> Ce lien expirera dans 45 minutes et ne peut être utilisé qu’une seule fois.</p>
-                                    
+                                <br>
+                                <a href="${link}">
+                                Si le lien n'apparaître pas bien, Veuillez cliquer ici.  
                                     <p>
                                     Si vous ne souhaitez pas modifier votre mot de passe ou n’êtes pas à l’origine de cette demande,
                                     ignorez ce message et supprimez-le.

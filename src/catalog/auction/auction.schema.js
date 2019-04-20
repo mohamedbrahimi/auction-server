@@ -1,5 +1,6 @@
 import Auction   from './auction.model';
 import Article   from '../article/article.model';
+import Category  from '../category/category.model';
 import Categorykey   from '../category-key/category-key.model';
 import Client from '../../mazaduse/client/client.model';
 import Bid from '../../mazaduse/bid/bid.model';
@@ -127,7 +128,17 @@ export const auctionResolvers = {
         delete filterflied.endDate
       }
       const auctions = await Auction.find(filterflied);
+
+      // Check if we have a mother category 
+      const category = await Category.findById(filterfront.category_id);
+      if(category && category.category_mother_id === "---"){
+        const category_array = await Category.distinct("_id", {category_mother_id: filterfront.category_id});
+        delete filterfront.category_id;
+        filterfront = Object.assign(filterfront, { category_id : { $in : category_array } });
+      }
       const articles = await Article.find(filterfront);
+
+      
 
       let array = [];
       await __.forEach(articles, async function(value) {
@@ -149,6 +160,15 @@ export const auctionResolvers = {
         delete filterflied.endDate
       }
       const auctions = await Auction.find(filterflied);
+
+      // Check if we have a mother category 
+      const category = await Category.findById(filterfront.category_id);
+      if(category && category.category_mother_id === "---"){
+        const category_array = await Category.distinct("_id", {category_mother_id: filterfront.category_id});
+        delete filterfront.category_id;
+        filterfront = Object.assign(filterfront, { category_id : { $in : category_array } });
+      }
+      
       const articles = await Article.find(filterfront);
 
       let array = [];

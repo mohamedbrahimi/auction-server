@@ -186,7 +186,7 @@ export default {
 
     messages_front: def_role_client,
     countMessages_front: def_role_client,
-   
+    editFrontMessage: def_role_client, 
 
     clients: def_role_client_admin,
     client: def_role_client_admin,

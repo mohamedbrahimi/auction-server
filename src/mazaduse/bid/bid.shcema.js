@@ -108,13 +108,18 @@ export const bidResolvers = {
       } catch (error) {
         throw new Error(errorName.UNAUTHORIZED);
       }
-        const participation = await tryAddBid(decoded.id, input.auction_id);
+        const participation       = await tryAddBid(decoded.id, input.auction_id);
+        const countParticipations = await Participation.countDocuments({auction_id: input.auction_id, archived: false});
+
          
         if(participation){
-            let auction      = await Auction.findOne({_id: input.auction_id, endDate : { $gt : new Date() }});
-            
+            let auction      = await Auction.findOne({_id: input.auction_id, startDate: { $lt : new Date() } ,endDate : { $gt : new Date() }});
             if(auction){
-              
+               
+                // CHECK IF NUMBER OF PARTICIPANTS IS SUFFICIENT
+                if(auction.minNumberParticipants > countParticipations)
+                    throw new Error(errorName.TRYADD_BID_INSUFFICIENT_NUMBER_OF_PARTICIPANTS);
+
                 const article    = await Article.findById(auction.model_id);
                 let currentPrice = (!auction.currentPrice ||  isNaN(auction.currentPrice))?0:parseFloat(auction.currentPrice);
                 let priceStart   = (!auction.priceStart ||  isNaN(auction.priceStart))?0:parseFloat(auction.priceStart);

@@ -14,6 +14,9 @@ const messageSchema = new mongoose.Schema({
           desc: {
             type: String,
           },
+          order_id: {
+            type: String,
+          },
           keynumber: {
             type: Number,
           },
@@ -87,16 +90,17 @@ messageSchema.pre('save', function(next) {
     let img  = doc.attached_file;
     let bool = ((img && img.indexOf('data:image/png;base64,') >= 0)?true:false);
     if(!bool){
-      delete doc.image;
+      delete doc.attached_file;
       next();
     }else{
       let currentDate = Date.now();
       let imageName   = `${doc_id._id}_${currentDate}`;
       removeParticularImage('attached_file', 'attached_file', doc_id._id);
-      base64Img.img(this.attached_file, `./public/assets/image/messages/attached_file`, imageName , function(err, filepath) {
-        this.getUpdate().this.attached_file = `/assets/image/messages/attached_file/${imageName}.png`;
+      base64Img.img(doc.attached_file, `./public/assets/image/messages/attached_file`, imageName , function(err, filepath) {
         next();
-    })
+    });
+    this.getUpdate().attached_file = `/assets/image/messages/attached_file/${imageName}.png`;
+
      
     }
      
