@@ -174,7 +174,7 @@ export function sendMail(data, type="confirmation", options = [])
                                 <p> Nous avons le plaisir de vous rappeller que vous avez participé à l'enchère : 
                                     ${options.article.label }</p>
                                 <p> Et pour ce la vous êtes invité à l'enchère sur le site 
-                                  <a href="${config.client.site}/product-detail/${options.auction._id}"> www.Mazadus.com </a> 
+                                  <a href="${config.client.site}/product-detail/${options.auction._id}"> www.mazadus.dz </a> 
                                    à ${ new Date(options.auction.startDate)}</p>
                                 <b> L’équipe de gestion des enchères mazadus.</b>` // html body
                         };

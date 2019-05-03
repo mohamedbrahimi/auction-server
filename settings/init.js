@@ -27,7 +27,9 @@ async function user_init(){
       // get permissions 
       let permissions       = config.permissions;
       let array_permissions = [];
-      for(let permission of permissions){
+
+
+      for(let permission of Object.values(permissions)){
           if(permission.auth)
             array_permissions.push(permission.ticket)
       }

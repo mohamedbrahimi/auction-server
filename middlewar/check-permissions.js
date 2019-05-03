@@ -20,8 +20,8 @@ module.exports = async(req, res, next) => {
                 const token = req.headers.authorization;
                 const decoded = jwt.verify(token, config.token.secret_client);
                 next();
-            } catch (error) {  
-                return res.status(401).json({ 
+            } catch (error) {
+                return res.status(401).json({
                     message: 'Auth failed'
                 });
             }
