@@ -3,10 +3,10 @@
  * Replace these variables with environment variables
  * so that it reduces friction.
  */
-
+// mongodb://mohamedaissa:mazadusmohamed@167.86.97.253:27017/e-auction?authSource=admin
 export default {
     mongodb: {
-      uri: 'mongodb://127.0.0.1:27017/e-auction'
+      uri: 'mongodb://127.0.0.1:27017/e-auction?authSource=admin'
     },
     server: {
       url: 'localhost',
@@ -32,9 +32,13 @@ export default {
          mail: "contactmazaduse@gmail.com"
       }
     },
+    constants: {
+      variable_to_check_date_of_launching: 1000 * 60 * 60,
+      notify_participant_timer: 1000 * 60 * 30
+    },
     debug: {
        mode: "dev",
-       chackpermission: false
+       checkpermission: false
     },
     styleImage:[
        {
@@ -68,7 +72,7 @@ export default {
           {
             path: "slide",
             data_path: [
-              
+
               {
                 size: [100,100],
                 path: "100x100"
@@ -91,9 +95,9 @@ export default {
               },
             ],
           }
-          
+
         ]
-        
+
       },
       {
         path: "slider",
@@ -124,13 +128,13 @@ export default {
               }
             ],
           }
-          
+
         ]
-        
+
       }
     ],
     permissions: {
-      login: { 
+      login: {
         ticket: '',
        },
        systemmanagement: {

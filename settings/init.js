@@ -9,10 +9,14 @@ import Client        from '../src/mazaduse/client/client.model';
 import { sendMail } from '../settings/mailling';
 
 import config    from './config';
+
 import fs        from 'fs';
+import moment from 'moment';
+import 'moment/locale/fr';
+
 
 export function init() {
-  
+
     user_init();
     folder_init();
     notify_participants_init();
@@ -24,7 +28,7 @@ async function user_init(){
   if(count_user == 0){
       // init role
       await Role.deleteMany({});
-      // get permissions 
+      // get permissions
       let permissions       = config.permissions;
       let array_permissions = [];
 
@@ -63,23 +67,28 @@ async function folder_init(){
             for(let im of itm.data_path){
                 let third_dir = `${root_path}/${super_dir}/${second_dir}/${im.path}`;
                 if (!fs.existsSync(third_dir)){
-                    fs.mkdirSync(third_dir); 
+                    fs.mkdirSync(third_dir);
                 }
             }
         }
     }
-    
+
 }
 
 
 function notify_participants_init(){
 
     setInterval( async () => {
-        
-         console.log('+1')
-         const auctions = await Auction.find({archived: false, endDate: { $gt : new Date() }});
+
+
+        let now   = moment().toDate();
+        let after = moment().add(config.constants.variable_to_check_date_of_launching /* get all auctions which start after specific time */).toDate();
+
+         const auctions = await Auction.find({archived: false, startDate: { $gt : now, $lt: after} });
+         // console.log( auctions.length);
+         // console.log( new Date().getSeconds() );
          for(let item of auctions){
-             
+
             const article        = await Article.findById( item.model_id);
             const participations = await Participation.find({ auction_id : item._id });
             for(let itm of participations){
@@ -91,8 +100,8 @@ function notify_participants_init(){
                 })
             }
          }
-  
-    },24 * 60 * 60000)
+
+    }, config.constants.notify_participant_timer  /*1000 * 5 */)
 }
 
 

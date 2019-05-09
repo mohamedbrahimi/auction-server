@@ -28,7 +28,7 @@ import checkpermission from  './middlewar/check-permissions'
 
 
 
-// traitement of error 
+// traitement of error
 
 const getErrorCode = errorName => {
 	return errorType[errorName];
@@ -42,11 +42,12 @@ ObjectId.prototype.valueOf = function () {
 const app = express()
 
 app.use(cors({origin : '*'}));
-app.use(bodyParser.json({ 'type': '*/*',limit: '20mb' })); 
+app.use(bodyParser.json({ 'type': '*/*',limit: '20mb' }));
 app.use(express.static(path.resolve('./public')));
 
+
 mongoose.connect(config.mongodb.uri,
-{ autoReconnect:true,
+{   autoReconnect:true,
     poolSize: 20,
 	socketTimeoutMS: 480000,
 	keepAlive: 300000,
@@ -60,9 +61,13 @@ mongoose.connect(config.mongodb.uri,
 );
 const connection = mongoose.connection;
 
-connection.once('open', () => {
-  console.log('MongoDB database connection established successfully!');
-});
+connection.once('open',
+    () => {
+      console.log('MongoDB database connection established successfully!');
+    },
+    () => {
+        console.log('MongoDB database connection failed!');
+    });
 
 app.use('/graphql',checkpermission, express_graphql({
    schema: schema,
@@ -76,9 +81,9 @@ app.use('/graphql',checkpermission, express_graphql({
             console.log(err)
             return ({ message: "unknown error", statusCode: 301})
         }
-	   
+
 	   }
-	   
+
    }
 
 ))
@@ -95,10 +100,10 @@ const io   = require('socket.io')(http);
 io.on('connection', (socket) => {
     initSocket(io, socket);
   });
- 
-  
+
+
 http.listen(config.server.port, () => {
 	console.log('Server Now Running On Port '+config.server.port+'!');
     init();
-    
+
 })

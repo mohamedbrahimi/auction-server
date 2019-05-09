@@ -1,6 +1,9 @@
 
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import moment from 'moment';
+import 'moment/locale/fr';
+
 import config    from './config';
 
 
@@ -8,27 +11,27 @@ import config    from './config';
 
 export function sendMail(data, type="confirmation", options = [])
 {
-            let link  = getToken(data, type);;   
+            let link  = getToken(data, type);;
         // GET EMAIL
-            
-           
-             let username = data.username; 
+
+
+             let username = data.username;
              let mail     = data.mail;
              // Generate test SMTP service account from ethereal.email
             // Only needed if you don't have a real mail account for testing
             nodemailer.createTestAccount((err, account) => {
                 // create reusable transporter object using the default SMTP transport
-                
+
                 var transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
                         user: config.mailling.username,
                         pass: config.mailling.password
                     }
-                }); 
- 
+                });
+
                 // setup email data with unicode symbols
-                let mailOptions; 
+                let mailOptions;
                 switch(type){
                     case "confirmation" : {
                         mailOptions = {
@@ -175,12 +178,12 @@ export function sendMail(data, type="confirmation", options = [])
                                     ${options.article.label }</p>
                                 <p> Et pour ce la vous êtes invité à l'enchère sur le site 
                                   <a href="${config.client.site}/product-detail/${options.auction._id}"> www.mazadus.dz </a> 
-                                   à ${ new Date(options.auction.startDate)}</p>
+                                   à ${ moment(options.auction.startDate).format('LLLL')}</p>
                                 <b> L’équipe de gestion des enchères mazadus.</b>` // html body
                         };
                     }break;
                 }
-        
+
 
                 // send mail with defined transport object
                 transporter.sendMail(mailOptions, (error, info) => {
@@ -194,25 +197,25 @@ export function sendMail(data, type="confirmation", options = [])
                         //console.log('Message sent: %s', info.messageId);
                         // Preview only available when sending through an Ethereal account
                         //console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-                
+
                         return info
                         //res.status(200).json({'send':'200!'});
                     }else {
                         //res.status(401).send('send error!, empty info');
                         return null
                     }
-                 
+
                     // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
                     // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
                 });
-            }); 
+            });
 }
 
 
 
 export function sendMailContact(data)
 {
-             let username = data.username; 
+             let username = data.username;
              let mail     = data.mail;
              let subject  = data.subject;
              let body     = data.message;
@@ -223,18 +226,18 @@ export function sendMailContact(data)
             // Only needed if you don't have a real mail account for testing
             nodemailer.createTestAccount((err, account) => {
                 // create reusable transporter object using the default SMTP transport
-                
+
                 var transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
                         user: config.mailling.username,
                         pass: config.mailling.password
                     }
-                }); 
- 
+                });
+
                 // setup email data with unicode symbols
-                let mailOptions; 
-               
+                let mailOptions;
+
                         mailOptions = {
                             from:  username+'<'+config.mailling.username+'>', // sender address
                             to: `${contact}`, // list of receivers
@@ -259,10 +262,10 @@ export function sendMailContact(data)
                         return null
                     }
                 });
-            }); 
+            });
 }
 function getToken(data, type){
-     
+
     switch(type){
        case "confirmation": {
          let token =    jwt.sign({
