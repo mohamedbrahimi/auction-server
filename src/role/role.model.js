@@ -4,7 +4,7 @@ import mongoose from 'mongoose'
  * validate the data sent to our database.
  */
 const roleSchema = new mongoose.Schema({
-         
+
           label: {
             type: String,
             required: true,
@@ -19,7 +19,7 @@ const roleSchema = new mongoose.Schema({
             default: Date.now
           },
           created_by: {
-            type: mongoose.Schema.Types.ObjectId, 
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
           },
           permissions: {

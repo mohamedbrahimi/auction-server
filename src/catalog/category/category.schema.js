@@ -60,20 +60,20 @@ export const CategoryTypeDefs = `
 export const categoryResolvers = {
   Query: {
     categories: async (_, { filter = {} }, context) => {
-      const categories = await Category.find({archived: false}, null, filter);
+      const categories = await Category.find({archived: false}, null, Object.assign(filter, { sort: { label: 1 } }));
       // notice that I have ": any[]" after the "Categorys" variable?
       // That is because I am using TypeScript but you can remove
       // this and it will work normally with pure JavaScript
-      
+
       return categories;
     },
     category: async (_, { id }) => {
       if(objectID.isValid(id)){
         const category  = await Category.findById(id);
         return category;
-      }else 
+      }else
        return null
-      
+
     },
     countCategories: async () => {
       const count = await Category.countDocuments({archived: false});
@@ -89,7 +89,7 @@ export const categoryResolvers = {
         }catch(e){
           console.log('error: create a new category. can\'t get the jwt object');
         }
-        
+
         const category  = await Category.create(input);
         return category;
     },
@@ -112,4 +112,4 @@ export const categoryResolvers = {
    },
   }
   }
-  
+
