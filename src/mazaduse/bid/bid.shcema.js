@@ -111,11 +111,11 @@ export const bidResolvers = {
         const participation       = await tryAddBid(decoded.id, input.auction_id);
         const countParticipations = await Participation.countDocuments({auction_id: input.auction_id, archived: false});
 
-         
+
         if(participation){
             let auction      = await Auction.findOne({_id: input.auction_id, startDate: { $lt : new Date() } ,endDate : { $gt : new Date() }});
             if(auction){
-               
+
                 // CHECK IF NUMBER OF PARTICIPANTS IS SUFFICIENT
                 if(auction.minNumberParticipants > countParticipations)
                     throw new Error(errorName.TRYADD_BID_INSUFFICIENT_NUMBER_OF_PARTICIPANTS);
@@ -125,28 +125,28 @@ export const bidResolvers = {
                 let priceStart   = (!auction.priceStart ||  isNaN(auction.priceStart))?0:parseFloat(auction.priceStart);
                     currentPrice = ( currentPrice == 0 )?priceStart:currentPrice;
                 let amountAdded  = (!auction.amountAdded ||  isNaN(auction.amountAdded))?0:parseFloat(auction.amountAdded);
-                
-                 if( article && (currentPrice+amountAdded) < parseFloat(article.sellingPrice) ){
+
+                 if( article && (currentPrice+amountAdded) < parseFloat(article.sellingPrice) && ( auction.updated_at < new Date() - config.client.block_request) ){
                       auction.currentPrice = `${currentPrice+amountAdded}`;
                       auction.client_id    =  decoded.id;
                       auction.updated_at   = new Date();
                       // NEED TO INJECT A PUSH NOTIFICATION
                       await auction.save();
                       //
-                      const bid = await Bid.create({ 
+                      const bid = await Bid.create({
                                                     participation_id: participation._id,
-                                                    auction_id: input.auction_id,  
+                                                    auction_id: input.auction_id,
                                                     price: auction.currentPrice
                                                   });
                 return bid;
                  }else{
                      throw new Error(errorName.TRYADD_BID_OVERTAKING);
                  }
-                
+
             }else{
                 throw new Error(errorName.UNAUTHORIZED);
             }
-            
+
         }else{
             throw new Error(errorName.TRYADD_ACTIONOFAUCTION);
         }
