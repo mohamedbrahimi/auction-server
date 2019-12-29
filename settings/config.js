@@ -3,7 +3,7 @@
  * Replace these variables with environment variables
  * so that it reduces friction.
  */
-// mongodb://mohamedaissa:mazadusmohamed@167.86.97.253:27017/e-auction?authSource=admin
+
 export default {
     mongodb: {
       uri: 'mongodb://127.0.0.1:27017/e-auction?authSource=admin'
